@@ -12,6 +12,10 @@ import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.route
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Controlador REST para la gestión de rutas.
+ * Proporciona endpoints para encontrar rutas, planificar rutas y obtener información de puertos.
+ */
 @RestController
 @RequestMapping("/api/v1/routes")
 @Tag(name = "Routes", description = "Route Management Endpoints")
@@ -20,6 +24,13 @@ public class RouteController {
 
     private final MapGraphService mapGraphService;
 
+    /**
+     * Encuentra la ruta óptima entre dos puertos.
+     *
+     * @param from Nombre del puerto de origen.
+     * @param to Nombre del puerto de destino.
+     * @return Una lista de recursos de puertos que representan la ruta óptima.
+     */
     @GetMapping("/find")
     public ResponseEntity<List<PortResource>> findRoute(
             @RequestParam String from,
@@ -44,6 +55,12 @@ public class RouteController {
         return ResponseEntity.ok(ports);
     }
 
+    /**
+     * Planifica una ruta entre dos puertos.
+     *
+     * @param request Objeto que contiene los nombres del puerto de origen y destino.
+     * @return Un resultado con la ruta planificada y un mensaje de estado.
+     */
     @PostMapping("/plan")
     public ResponseEntity<RoutePlanResult> planRoute(@RequestBody RoutePlanRequest request) {
         var route = mapGraphService.findOptimalRoute(request.from(), request.to());
@@ -53,6 +70,11 @@ public class RouteController {
         return ResponseEntity.ok(new RoutePlanResult(route, "Ruta encontrada"));
     }
 
+    /**
+     * Obtiene todos los puertos disponibles.
+     *
+     * @return Una lista de recursos de puertos.
+     */
     @GetMapping("/ports")
     public ResponseEntity<List<PortResource>> getAllPorts() {
         var ports = mapGraphService.getAllPorts();
