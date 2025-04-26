@@ -61,15 +61,13 @@ public class WebSecurityConfiguration {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        http.cors(configurer -> {
-            configurer.configurationSource(c -> {
-                var cors = new CorsConfiguration();
-                cors.setAllowedOrigins(List.of("*"));
-                cors.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-                cors.setAllowedHeaders(List.of("*"));
-                return cors;
-            });
-        });
+        http.cors(configurer -> configurer.configurationSource(c -> {
+            var cors = new CorsConfiguration();
+            cors.setAllowedOrigins(List.of("*"));
+            cors.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+            cors.setAllowedHeaders(List.of("*"));
+            return cors;
+        }));
         http.csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(exceptionHandling -> exceptionHandling.
                         authenticationEntryPoint(unauthorizedRequestHandler))
