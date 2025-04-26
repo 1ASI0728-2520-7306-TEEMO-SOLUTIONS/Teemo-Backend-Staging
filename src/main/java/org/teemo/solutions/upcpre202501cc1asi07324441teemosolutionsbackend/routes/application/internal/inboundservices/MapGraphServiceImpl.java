@@ -1,5 +1,6 @@
 package org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.routes.application.internal.inboundservices;
 
+import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -7,6 +8,7 @@ import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.route
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.routes.domain.model.entities.Edge;
 
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.routes.domain.services.MapGraphService;
+import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.routes.infrastructure.persistence.jpa.repositories.EdgeRepository;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.routes.infrastructure.persistence.jpa.repositories.PortRepository;
 
 import java.util.*;
@@ -16,12 +18,30 @@ import java.util.*;
 @Getter
 public class MapGraphServiceImpl implements MapGraphService {
 
-    private final Map<String, Port> ports = new HashMap<>();
-    private final Map<String, List<Edge>> adjacencyList = new HashMap<>();
     private final PortRepository portRepository;
+    private final EdgeRepository edgeRepository;
+
+    private Map<String, Port> ports = new HashMap<>();
+    private Map<String, List<Edge>> adjacencyList = new HashMap<>();
+
+    @PostConstruct
+    public void init() {
+        // Cargar todos los puertos
+        portRepository.findAll().forEach(port -> ports.put(port.getName(), port));
+
+        // Cargar todas las rutas (edges)
+        edgeRepository.findAll().forEach(edge -> {
+            String originName = edge.getOriginPort().getName();
+            adjacencyList.computeIfAbsent(originName, k -> new ArrayList<>()).add(edge);
+        });
+    }
 
     @Override
     public List<String> findOptimalRoute(String startName, String goalName) {
+        if (!ports.containsKey(startName) || !ports.containsKey(goalName)) {
+            return Collections.emptyList();
+        }
+
         PriorityQueue<Node> openSet = new PriorityQueue<>(Comparator.comparingDouble(Node::getF));
         Map<String, Double> gScores = new HashMap<>();
         Map<String, String> cameFrom = new HashMap<>();
@@ -38,11 +58,17 @@ public class MapGraphServiceImpl implements MapGraphService {
                 return reconstructPath(cameFrom, currentName);
             }
 
+            if (closedSet.contains(currentName)) {
+                continue;
+            }
+
             closedSet.add(currentName);
 
-            for (Edge edge : adjacencyList.getOrDefault(currentName, new ArrayList<>())) {
+            for (Edge edge : adjacencyList.getOrDefault(currentName, Collections.emptyList())) {
                 String neighbor = edge.getDestinationPort().getName();
-                if (closedSet.contains(neighbor)) continue;
+                if (closedSet.contains(neighbor)) {
+                    continue;
+                }
 
                 double tentativeG = gScores.getOrDefault(currentName, Double.MAX_VALUE) + edge.getDistance();
 
@@ -75,7 +101,7 @@ public class MapGraphServiceImpl implements MapGraphService {
         double lat1 = from.getLatitude(), lon1 = from.getLongitude();
         double lat2 = to.getLatitude(), lon2 = to.getLongitude();
 
-        double R = 6371;
+        double R = 6371; // Radio de la Tierra en km
         double dLat = Math.toRadians(lat2 - lat1);
         double dLon = Math.toRadians(lon2 - lon1);
         double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
@@ -101,5 +127,4 @@ public class MapGraphServiceImpl implements MapGraphService {
     public List<Port> getAllPorts() {
         return portRepository.findAll();
     }
-
 }
