@@ -69,15 +69,6 @@ public class AStarPathfinder {
         return R * 2 * Math.atan2(Math.sqrt(aFormula), Math.sqrt(1 - aFormula));
     }
 
-    private static class Node {
-        final Port port;
-        final double gScore;
-        final double fScore;
-
-        public Node(Port port, double gScore, double fScore) {
-            this.port = port;
-            this.gScore = gScore;
-            this.fScore = fScore;
-        }
+    private record Node(Port port, double gScore, double fScore) {
     }
 }

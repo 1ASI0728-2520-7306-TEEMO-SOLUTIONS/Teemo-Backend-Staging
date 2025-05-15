@@ -18,7 +18,4 @@ public class RouteGraph {
         adjacencyList.computeIfAbsent(source, k -> new ArrayList<>()).add(edge);
     }
 
-    public List<RouteEdge> getEdges(Port port) {
-        return adjacencyList.getOrDefault(port, Collections.emptyList());
-    }
 }

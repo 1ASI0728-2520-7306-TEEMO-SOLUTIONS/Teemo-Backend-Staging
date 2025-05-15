@@ -1,49 +1,36 @@
 package org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.aggregates;
 
-import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.entities.Port;
+import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.infrastructure.domain.EventDocument;
+import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.infrastructure.persistence.sdmdb.EventRepository;
 
 import java.util.List;
-import java.util.Map;
 
-// SafetyValidator.java
 @Component
+@RequiredArgsConstructor
 public class SafetyValidator {
 
-    private static final Map<String, RiskLevel> PORT_RISKS = Map.of(
-            "Alexandria", RiskLevel.HIGH,
-            "Toamasina", RiskLevel.HIGH,
-            "Eupatoria", RiskLevel.HIGH,
-            "Dubai", RiskLevel.MEDIUM,
-            "Shanghai", RiskLevel.MEDIUM
-    );
+    private final EventRepository eventRepository;
 
     public List<String> validateRoute(List<Port> route) {
+        List<EventDocument> eventos = eventRepository.findAll();
+
         return route.stream()
-                .filter(port -> PORT_RISKS.containsKey(port.getName()))
-                .map(port -> formatWarning(port, PORT_RISKS.get(port.getName())))
+                .flatMap(port -> eventos.stream()
+                        .filter(evento -> evento.getPuertoOrigen().equalsIgnoreCase(port.getName()))
+                        .map(this::formatWarning)
+                )
                 .toList();
     }
 
-    private String formatWarning(Port port, RiskLevel risk) {
+    private String formatWarning(EventDocument evento) {
         return String.format("[%s] %s: %s",
-                risk.name(),
-                port.getName(),
-                risk.getDescription()
+                evento.getEsSegura().equalsIgnoreCase("No segura") ? "ALERTA" : "INFO",
+                evento.getPuertoOrigen(),
+                evento.getProblemaGeopolitico() != null ?
+                        evento.getProblemaGeopolitico() : evento.getEventoMaritimo()
         );
-    }
-
-    @Getter
-    private enum RiskLevel {
-        HIGH("Zona de alto riesgo - Evitar si es posible"),
-        MEDIUM("Zona de riesgo moderado - Tomar precauciones");
-
-        private final String description;
-
-        RiskLevel(String description) {
-            this.description = description;
-        }
-
     }
 }
