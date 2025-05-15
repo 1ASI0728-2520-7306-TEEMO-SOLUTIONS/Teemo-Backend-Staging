@@ -34,7 +34,7 @@ public class UsersController {
     }
 
     @GetMapping(value= "/{userId}")
-    public ResponseEntity<UserResource> getUserById(@PathVariable Long userId) {
+    public ResponseEntity<UserResource> getUserById(@PathVariable String userId) {
         var getUserByIdQuery = new GetUserByIdQuery(userId);
         var user = userQueryService.handle(getUserByIdQuery);
         if (user.isEmpty()) return ResponseEntity.notFound().build();

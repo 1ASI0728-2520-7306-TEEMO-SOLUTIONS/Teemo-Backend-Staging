@@ -13,7 +13,6 @@ import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.iam.i
  */
 @Service(value = "defaultUserDetailsService")
 public class UserDetailsServiceImpl implements UserDetailsService {
-
     private final UserRepository userRepository;
 
     public UserDetailsServiceImpl(UserRepository userRepository) {

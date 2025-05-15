@@ -12,32 +12,53 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class OpenApiConfiguration {
+
+    private static final String SECURITY_SCHEME_NAME = "Bearer Authentication";
+    private static final String SECURITY_SCHEME = "bearer";
+    private static final String SECURITY_FORMAT = "JWT";
+
+    // En OpenApiConfiguration.java
     @Bean
-    public OpenAPI learningPlatformOpenApi() {
-        var openApi = new OpenAPI();
-        openApi
+    public OpenAPI customOpenAPI() {
+        return new OpenAPI()
                 .info(new Info()
-                        .title("ACME Learning Platform API")
-                        .description("ACME Learning Platform application REST API documentation.")
-                        .version("v1.0.0")
-                        .license(new License().name("Apache 2.0")
-                                .url("https://springdoc.org")))
+                        .title("Teemo Solutions API")
+                        .version("1.0.0")
+                        .description("Documentación de la API de optimización de rutas marítimas")
+                )
                 .externalDocs(new ExternalDocumentation()
-                        .description("ACME Learning Platform wiki Documentation")
-                        .url("https://acme-learning-platform.wiki.github.io/docs"));
-
-        final String securitySchemeName = "bearerAuth";
-
-
-        openApi.addSecurityItem(new SecurityRequirement()
-                        .addList(securitySchemeName))
+                        .description("Documentación técnica")
+                        .url("https://teemo-solutions.com/docs"))
+                .addSecurityItem(new SecurityRequirement().addList("BearerAuth"))
                 .components(new Components()
-                        .addSecuritySchemes(securitySchemeName, new SecurityScheme()
-                                .name(securitySchemeName)
-                                .type(SecurityScheme.Type.HTTP)
-                                .scheme("bearer")
-                                .bearerFormat("JWT")));
+                        .addSecuritySchemes("BearerAuth",
+                                new SecurityScheme()
+                                        .type(SecurityScheme.Type.HTTP)
+                                        .scheme("bearer")
+                                        .bearerFormat("JWT")));
+    }
 
-        return openApi;
+    private Info apiInfo() {
+        return new Info()
+                .title("Teemo Solutions Mapping API")
+                .description("API documentation for Teemo Solutions Maritime Route Optimization System")
+                .version("1.0.0")
+                .license(new License()
+                        .name("Apache 2.0")
+                        .url("https://www.apache.org/licenses/LICENSE-2.0"));
+    }
+
+    private Components securityComponents() {
+        return new Components()
+                .addSecuritySchemes(SECURITY_SCHEME_NAME,
+                        new SecurityScheme()
+                                .type(SecurityScheme.Type.HTTP)
+                                .scheme(SECURITY_SCHEME)
+                                .bearerFormat(SECURITY_FORMAT));
+    }
+
+    private SecurityRequirement securityRequirement() {
+        return new SecurityRequirement()
+                .addList(SECURITY_SCHEME_NAME);
     }
 }

@@ -14,9 +14,10 @@ import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.iam.i
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/api/v1/roles", produces = MediaType.APPLICATION_JSON_VALUE)
-@Tag(name= "roles", description = "role management endpoints")
+@RequestMapping(value = "/api/roles", produces = MediaType.APPLICATION_JSON_VALUE)
+@Tag(name = "Roles", description = "Role Management Endpoints")
 public class RolesController {
+
     private final RoleQueryService roleQueryService;
 
     public RolesController(RoleQueryService roleQueryService) {

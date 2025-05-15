@@ -1,6 +1,7 @@
 package org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.iam.application.internal.queryservices;
 
 import org.springframework.stereotype.Service;
+import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.iam.application.internal.repositoriesimpl.UserRepositoryImpl;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.iam.domain.model.aggregates.User;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.iam.domain.model.queries.GetAllUsersQuery;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.iam.domain.model.queries.GetUserByIdQuery;
@@ -13,12 +14,12 @@ import java.util.Optional;
 
 @Service
 public class UserQueryServiceImpl implements UserQueryService {
-    private final UserRepository userRepository;
+
+    private final UserRepositoryImpl userRepository;
 
     public UserQueryServiceImpl(UserRepository userRepository) {
-        this.userRepository = userRepository;
+        this.userRepository = (UserRepositoryImpl) userRepository;
     }
-
 
     @Override
     public List<User> handle(GetAllUsersQuery query) {

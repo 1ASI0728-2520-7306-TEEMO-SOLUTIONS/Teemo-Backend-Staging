@@ -9,12 +9,14 @@ import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.iam.d
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
 @EqualsAndHashCode
 public class UserDetailsImpl implements UserDetails {
 
+    private final String id;
     private final String username;
     @JsonIgnore
     private final String password;
@@ -24,31 +26,24 @@ public class UserDetailsImpl implements UserDetails {
     private final boolean enabled;
     private final Collection<? extends GrantedAuthority> authorities;
 
-    public UserDetailsImpl(String username, String password, Collection<? extends GrantedAuthority> authorities) {
+    public UserDetailsImpl(String id, String username, String password,
+                           Collection<? extends GrantedAuthority> authorities) {
+        this.id = id;
         this.username = username;
         this.password = password;
-        this.authorities = authorities;
         this.accountNonExpired = true;
         this.accountNonLocked = true;
         this.credentialsNonExpired = true;
         this.enabled = true;
+        this.authorities = authorities;
     }
 
-    /**
-     * This method is responsible for building the UserDetailsImpl object from the User object.
-     * @param user The user object.
-     * @return The UserDetailsImpl object.
-     */
     public static UserDetailsImpl build(User user) {
-        var authorities = user.getRoles().stream()
-                .map(role -> role.getName().name())
-                .map(SimpleGrantedAuthority::new)
+        List<GrantedAuthority> authorities = user.getRoles().stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName().toString()))
                 .collect(Collectors.toList());
-        return new UserDetailsImpl(
-                user.getUsername(),
-                user.getPassword(),
-                authorities);
+        return new UserDetailsImpl(user.getId(), user.getUsername(), user.getPassword(), authorities);
     }
+
 
 }
-

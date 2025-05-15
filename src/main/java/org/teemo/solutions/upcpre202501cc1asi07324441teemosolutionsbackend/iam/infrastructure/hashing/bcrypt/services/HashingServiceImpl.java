@@ -18,7 +18,7 @@ public class HashingServiceImpl implements BCryptHashingService {
     }
 
     @Override
-    public boolean matches(CharSequence rawPassword, String encodePassword) {
-        return passwordEncoder.matches(rawPassword, encodePassword);
+    public boolean matches(CharSequence rawPassword, String encodedPassword) {
+        return passwordEncoder.matches(rawPassword, encodedPassword);
     }
 }

@@ -11,10 +11,12 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class RoleQueryServiceImpl  implements RoleQueryService {
+public class RoleQueryServiceImpl implements RoleQueryService {
+
     private final RoleRepository roleRepository;
 
     public RoleQueryServiceImpl(RoleRepository roleRepository) {
+
         this.roleRepository = roleRepository;
     }
 
