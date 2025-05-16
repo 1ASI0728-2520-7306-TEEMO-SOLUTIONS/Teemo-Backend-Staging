@@ -3,7 +3,4 @@ package org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapp
 /**
  * @param latitude Getters
  */
-public record Coordinates(double latitude, double longitude) {
-    // Constructor
-
-}
+public record Coordinates(double latitude, double longitude) {}

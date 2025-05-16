@@ -2,5 +2,6 @@ package org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapp
 
 public record RouteRequestResource(
         String startPort,
-        String endPort
+        String endPort,
+        String continent // Nuevo campo
 ) {}

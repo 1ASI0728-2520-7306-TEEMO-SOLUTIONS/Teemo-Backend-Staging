@@ -12,18 +12,26 @@ import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.share
 @Document(collection = "routes-documents")
 @CompoundIndex(name = "unique_route", def = "{'homePort': 1, 'destinationPort': 1}", unique = true)
 public class RouteDocument extends AuditableAbstractAggregateRoot<RouteDocument> {
-    @Field("Home Port") // 👈 Mapear campo con espacio
+    @Field("Home Port")
     private String homePort;
+
+    @Field("Home Continent")
+    private String homeContinent;
 
     @Field("Destination Port")
     private String destinationPort;
 
-    @Field("Distance")
-    private Double distance; // Ej: 2000.0
+    @Field("Destination Continent")
+    private String destinationContinent;
 
-    public RouteDocument(String homePort, String destinationPort, double distance) {
+    @Field("Distance")
+    private Double distance;
+
+    public RouteDocument(String homePort, String homeContinent, String destinationPort, String destinationContinent, Double distance) {
         this.homePort = homePort;
+        this.homeContinent = homeContinent;
         this.destinationPort = destinationPort;
+        this.destinationContinent = destinationContinent;
         this.distance = distance;
     }
 }

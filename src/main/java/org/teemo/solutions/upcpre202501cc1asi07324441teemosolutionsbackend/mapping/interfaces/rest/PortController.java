@@ -1,8 +1,6 @@
 package org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.interfaces.rest;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +9,8 @@ import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mappi
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.interfaces.rest.resources.*;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.interfaces.rest.transform.CreatePortCommandFromResourceAssembler;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.interfaces.rest.transform.PortResourceFromEntityAssembler;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/ports", produces = MediaType.APPLICATION_JSON_VALUE) // 👈 Plural
@@ -29,7 +29,7 @@ public class PortController {
     @PostMapping
     public ResponseEntity<PortResource> createPort(@RequestBody CreatePortResource resource) {
         var command = CreatePortCommandFromResourceAssembler.toCommandFromResource(resource);
-        var port = portService.handle(command);
+        var port = portService.createPort(command);
         var portResource = PortResourceFromEntityAssembler.toResourceFromEntity(port);
         return new ResponseEntity<>(portResource, HttpStatus.CREATED);
     }
@@ -65,14 +65,14 @@ public class PortController {
         return ResponseEntity.noContent().build();
     }
 
-    // Endpoint para obtener todos los puertos de forma paginada
-    // Ruta: GET /api/ports
-    // Descripción: Devuelve una lista paginada de todos los puertos disponibles en el sistema.
-    @GetMapping
-    public ResponseEntity<Page<PortResource>> getAllPorts(Pageable pageable) {
+    // Endpoint para obtener todos los puertos
+    @GetMapping("/all-ports")
+    public ResponseEntity<List<PortResource>> getAllPorts() {
         return ResponseEntity.ok(
-                portService.getAllPorts(pageable)
+                portService.getAllPorts()
+                        .stream()
                         .map(PortResourceFromEntityAssembler::toResourceFromEntity)
+                        .toList()
         );
     }
 }

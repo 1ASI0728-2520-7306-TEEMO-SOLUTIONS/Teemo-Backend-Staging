@@ -1,4 +1,4 @@
-package org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.infrastructure.persistence.sdmdb;
+/*package org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.infrastructure.persistence.sdmdb;
 
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +10,7 @@ import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mappi
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.infrastructure.persistence.sdmdb.repositories.RouteRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 // Infrastructure Layer
 @Component
@@ -25,239 +26,207 @@ public class DataInitializer {
     public void init() {
         initPorts();
         initRoutes();
+        validateRoutes();
     }
 
     private void initPorts() {
         List<Port> ports = List.of(
-                // Puertos para mapa3.png (Asia)
-                new Port("Tokyo", new Coordinates(31.6895, -34.6917), "Asia"),
-                new Port("Busan", new Coordinates(30.6895, -43.6917), "Asia"),
-                new Port("Shanghai", new Coordinates(27.2304, -50.4737), "Asia"),
-                new Port("Tianjing", new Coordinates(34.2304, -55.4737), "Asia"),
-                new Port("Hon Kong", new Coordinates(19.2304, -58.4737), "Asia"),
-                new Port("Quanzhou", new Coordinates(22.2304, -51.4737), "Asia"),
-                new Port("Zhanjiang", new Coordinates(35.2304, -45.4737), "Asia"),
-                new Port("Mascate", new Coordinates(17.0, -115.296249), "Asia"),
-                new Port("Singapore", new Coordinates(5.3521, -65.8198), "Asia"),
-                new Port("Yakarta", new Coordinates(0.0, -64.0), "Asia"),
-                new Port("Mumbai", new Coordinates(18.0760, -98.8777), "Asia"),
-                new Port("Chennai", new Coordinates(14.0, -89.8198), "Asia"),
-                new Port("Tuticorin", new Coordinates(9.0, -92.8198), "Asia"),
-                new Port("Dubai", new Coordinates(22.276987, -118.296249), "Asia"),
-                new Port("Alexandria", new Coordinates(26.276987, -142.296249), "Asia"),
-                new Port("Aden", new Coordinates(13.0, -128.0), "Asia"),
-                new Port("San Petersburgo", new Coordinates(52.0, -147.0), "Asia"),
-                new Port("Murmansk", new Coordinates(62.0, -147.0), "Asia"),
-                new Port("Arkits", new Coordinates(75.0, -128.0), "Asia"),
-                new Port("Uelen", new Coordinates(77.0, -16.0), "Asia"),
-                new Port("Copenhague", new Coordinates(47.0, -163.0), "Asia"),
-                new Port("Sidney", new Coordinates(-23.0, -21.0), "Asia"),
-                new Port("Brisbane", new Coordinates(-19.0, -17.0), "Asia"),
-                new Port("Fremantle", new Coordinates(-20.0, -57.0), "Asia"),
-                new Port("Darwin", new Coordinates(-5.0, -35.0), "Asia"),
-                new Port("Moresby", new Coordinates(-3.0, -21.0), "Asia"),
+                // ========== ASIA ==========
+                new Port("Tokyo", new Coordinates(35.6895, 139.6917), "Asia"),
+                new Port("Busan", new Coordinates(35.1796, 129.0756), "Asia"),
+                new Port("Shanghai", new Coordinates(31.2304, 121.4737), "Asia"),
+                new Port("Tianjin", new Coordinates(39.0842, 117.2010), "Asia"),
+                new Port("Hong Kong", new Coordinates(22.3193, 114.1694), "Asia"),
+                new Port("Quanzhou", new Coordinates(24.9139, 118.5858), "Asia"),
+                new Port("Zhanjiang", new Coordinates(21.1967, 110.4031), "Asia"),
+                new Port("Muscat", new Coordinates(23.6142, 58.5458), "Asia"), // Mascate corregido
+                new Port("Singapore", new Coordinates(1.3521, 103.8198), "Asia"),
+                new Port("Jakarta", new Coordinates(-6.2088, 106.8456), "Asia"), // Yakarta corregido
+                new Port("Mumbai", new Coordinates(19.0760, 72.8777), "Asia"),
+                new Port("Chennai", new Coordinates(13.0827, 80.2707), "Asia"),
+                new Port("Tuticorin", new Coordinates(8.7642, 78.1348), "Asia"),
+                new Port("Dubai", new Coordinates(25.2769, 55.2962), "Asia"),
+                new Port("Aden", new Coordinates(12.8000, 45.0333), "Asia"),
+                new Port("Vladivostok", new Coordinates(43.1056, 131.8735), "Asia"), // San Petersburgo asiático
+                new Port("Uelen", new Coordinates(66.1667, -169.8000), "Asia"), // Rusia (Asia)
 
-                // Puertos americanos en Asia
-                new Port("callao", new Coordinates(-11.276987, 65.296249), "Asia"),
-                new Port("buenos aires", new Coordinates(-34.276987, 89.0), "Asia"),
-                new Port("Valparaiso", new Coordinates(-27.276987, 75.0), "Asia"),
-                new Port("Rio de janeiro", new Coordinates(-20.9068, 110.1729), "Asia"),
-                new Port("fort lauderdale", new Coordinates(18.276987, 64.0), "Asia"),
-                new Port("guayaquil", new Coordinates(-4.276987, 62.5), "Asia"),
-                new Port("balboa", new Coordinates(3.276987, 64.0), "Asia"),
-                new Port("manzanilla", new Coordinates(14.0, 34.0), "Asia"),
-                new Port("long beach", new Coordinates(25.0, 22.0), "Asia"),
-                new Port("new york", new Coordinates(31.0, 74.0), "Asia"),
-                new Port("houston", new Coordinates(21.0, 50.0), "Asia"),
-                new Port("san francisco", new Coordinates(29.0, 19.0), "Asia"),
-                new Port("vancouver", new Coordinates(42.0, 23.0), "Asia"),
-                new Port("prince roupert", new Coordinates(49.0, 20.0), "Asia"),
-                new Port("Guayana francesa", new Coordinates(0.0, 96.0), "Asia"),
-                new Port("cartagena", new Coordinates(6.0, 70.0), "Asia"),
-                new Port("cabello", new Coordinates(5.0, 80.0), "Asia"),
+                // ========== AMÉRICA ==========
+                new Port("Arkits", new Coordinates(73.0, -128.0), "América"), // Canadá ártico
+                new Port("Callao", new Coordinates(-12.0564, -77.1319), "América"), // Perú
+                new Port("Buenos Aires", new Coordinates(-34.6037, -58.3816), "América"),
+                new Port("Valparaíso", new Coordinates(-33.0472, -71.6128), "América"),
+                new Port("Rio de Janeiro", new Coordinates(-22.9068, -43.1729), "América"),
+                new Port("Fort Lauderdale", new Coordinates(26.1224, -80.1373), "América"),
+                new Port("Guayaquil", new Coordinates(-2.1962, -79.8862), "América"),
+                new Port("Balboa", new Coordinates(8.9833, -79.5167), "América"), // Panamá
+                new Port("Manzanillo", new Coordinates(19.0514, -104.3158), "América"), // México
+                new Port("Long Beach", new Coordinates(33.7709, -118.1937), "América"),
+                new Port("New York", new Coordinates(40.7128, -74.0060), "América"),
+                new Port("Houston", new Coordinates(29.7604, -95.3698), "América"),
+                new Port("San Francisco", new Coordinates(37.7749, -122.4194), "América"),
+                new Port("Vancouver", new Coordinates(49.2827, -123.1207), "América"),
+                new Port("Prince Rupert", new Coordinates(54.3150, -130.3208), "América"), // Canadá (corregido nombre)
+                new Port("Cayena", new Coordinates(4.9372, -52.3260), "América"), // Guayana Francesa
+                new Port("Cartagena", new Coordinates(10.3932, -75.4832), "América"),
+                new Port("Puerto Cabello", new Coordinates(10.4731, -68.0125), "América"), // Cabello corregido
+                new Port("San Antonio", new Coordinates(-33.5983, -71.6123), "América"), // Chile
+                new Port("Montreal", new Coordinates(45.5017, -73.5673), "América"),
+                new Port("Rio Grande", new Coordinates(-32.0351, -52.0986), "América"), // Brasil
 
-                // Puertos africanos en Asia
-                new Port("abiyan", new Coordinates(8.0, -177.5), "Africa"),
-                new Port("durban", new Coordinates(-20.0, -150.0), "Africa"),
-                new Port("mombasa", new Coordinates(2.5, -133.0), "Africa"),
-                new Port("toamasina", new Coordinates(-8.0, -124.0), "Africa"),
-                new Port("port-Gentil", new Coordinates(4.0, -165.0), "Africa"),
+                // ========== ÁFRICA ==========
+                new Port("Ciudad del Cabo", new Coordinates(-33.9249, 18.4241), "África"), // Sudáfrica
+                new Port("Abiyán", new Coordinates(5.3599, -4.0084), "África"), // Costa de Marfil
+                new Port("Durban", new Coordinates(-29.8833, 31.0500), "África"),
+                new Port("Mombasa", new Coordinates(-4.0435, 39.6682), "África"),
+                new Port("Toamasina", new Coordinates(-18.1443, 49.3958), "África"),
+                new Port("Port-Gentil", new Coordinates(-0.7167, 8.7833), "África"),
+                new Port("Nuakchot", new Coordinates(18.0731, -15.9582), "África"), // Mauritania
+                new Port("Dakar", new Coordinates(14.7167, -17.4677), "África"),
+                new Port("Lagos", new Coordinates(6.4541, 3.3947), "África"),
+                new Port("Walvis Bay", new Coordinates(-22.9587, 14.5058), "África"), // Namibia (corregido)
+                new Port("Luanda", new Coordinates(-8.8383, 13.2344), "África"),
+                new Port("Alexandría", new Coordinates(31.2001, 29.9187), "África"),
+                new Port("Casablanca", new Coordinates(33.5731, -7.5898), "África"), // Pertenece a África
+                new Port("Mogadishu", new Coordinates(2.0469, 45.3182), "África"), // Somalia
 
-                // Puertos europeos en Asia
-                new Port("genova", new Coordinates(35.276987, -165.296249), "Asia"),
-                new Port("atenas", new Coordinates(31.276987, -152.296249), "Asia"),
-                new Port("valencia", new Coordinates(32.276987, -174.296249), "Asia"),
-                new Port("le havre", new Coordinates(37.276987, -174.296249), "Asia"),
-                new Port("hamburg", new Coordinates(43.276987, -167.296249), "Asia"),
-                new Port("eupatoria", new Coordinates(37.276987, -140.296249), "Asia"),
-                new Port("Stavanger", new Coordinates(52.276987, -168.296249), "Asia"),
+                // ========== EUROPA ==========
+                new Port("Murmansk", new Coordinates(68.9585, 33.0827), "Europa"), // Pertenece a Rusia europea
+                new Port("Estambul", new Coordinates(41.0082, 28.9784), "Europa"),
+                new Port("Constanza", new Coordinates(44.1598, 28.6348), "Europa"), // Rumania
+                new Port("Mersin", new Coordinates(36.7950, 34.6179), "Europa"), // Turquía (Europa/Asia, pero asignado a Europa)
+                new Port("Lisboa", new Coordinates(38.7223, -9.1393), "Europa"), // Portugal
+                new Port("Valencia", new Coordinates(39.4699, -0.3763), "Europa"),
+                new Port("Hamburgo", new Coordinates(53.5488, 9.9872), "Europa"),
+                new Port("Rotterdam", new Coordinates(51.9244, 4.4777), "Europa"),
+                new Port("Le Havre", new Coordinates(49.4944, 0.1089), "Europa"),
+                new Port("Genova", new Coordinates(44.4056, 8.9463), "Europa"),
+                new Port("Atenas", new Coordinates(37.9838, 23.7275), "Europa"),
+                new Port("San Petersburgo", new Coordinates(59.9343, 30.3351), "Europa"),
+                new Port("Copenhague", new Coordinates(55.6761, 12.5683), "Europa"),
+                new Port("Stavanger", new Coordinates(58.9699, 5.7331), "Europa"), // Noruega
+                new Port("Eupatoria", new Coordinates(45.2000, 33.3583), "Europa"), // Crimea
 
-                // Puertos para otros mapas
-                new Port("New York", new Coordinates(55.7128, -106.0060), "América"),
-                new Port("Long Beach", new Coordinates(54.0, -169.0060), "América"),
-                new Port("San Francisco", new Coordinates(59.7128, -173.0060), "América"),
-                new Port("Fort Lauderdale", new Coordinates(43.7128, -111.0060), "América"),
-                new Port("Panama City", new Coordinates(20.9824, -109.5199), "América"),
-                new Port("Manzanillo", new Coordinates(36.9824, -149.5199), "América"),
-                new Port("Buenos Aires", new Coordinates(-40.6037, -85.3816), "América"),
-                new Port("Rio de Janeiro", new Coordinates(-10.9068, -45.1729), "América"),
-                new Port("Rio Grande", new Coordinates(-30.9068, -70.1729), "América"),
-                new Port("Guayana Francesa", new Coordinates(16.9068, -65.1729), "América"),
-                new Port("Callao", new Coordinates(0.9068, -106.1729), "América"),
-                new Port("Guayaquil", new Coordinates(8.5068, -110.1729), "América"),
-                new Port("Cartagena", new Coordinates(25.9068, -100.1729), "América"),
-                new Port("Cabello", new Coordinates(23.9068, -85.1729), "América"),
-                new Port("San Antonio", new Coordinates(-28.5068, -95.1729), "América"),
-                new Port("Montreal", new Coordinates(70.0, -100.0), "América"),
-
-                // Puertos europeos
-                new Port("Portugal", new Coordinates(63.0, 2.5), "Europa"),
-                new Port("Valencia", new Coordinates(61.0, 15.5), "Europa"),
-                new Port("Hamburg", new Coordinates(83.6, 34.0), "Europa"),
-                new Port("Roterdam", new Coordinates(81.6, 24.0), "Europa"),
-                new Port("Le Havre", new Coordinates(70.5, 15.1), "Europa"),
-                new Port("Genova", new Coordinates(69.0, 30.5), "Europa"),
-                new Port("Atenas", new Coordinates(60.0, 49.5), "Europa"),
-                new Port("Casablanca", new Coordinates(52.0, 2.5), "Europa"),
-
-                // Puertos africanos
-                new Port("Nuakchot", new Coordinates(35.0, -7.5), "Africa"),
-                new Port("Dakar", new Coordinates(30.0, -10.5), "Africa"),
-                new Port("Abiyan", new Coordinates(19.0, 6.5), "Africa"),
-                new Port("Lagos", new Coordinates(19.0, 23.5), "Africa"),
-                new Port("Walbys bay", new Coordinates(-15.0, 40.0), "Africa"),
-                new Port("Durban", new Coordinates(-31.0, 48.0), "Africa"),
-                new Port("Mombasa", new Coordinates(7.0, 80.0), "Africa"),
-                new Port("Toamasina", new Coordinates(-10.0, 93.0), "Africa"),
-                new Port("Port-Gentil", new Coordinates(10.0, 31.0), "Africa"),
-                new Port("Luanda", new Coordinates(-1.0, 39.0), "Africa"),
-                new Port("alexandria", new Coordinates(51.0, 66.0), "Africa"),
-                new Port("aden", new Coordinates(28.0, 85.0), "Africa"),
-                new Port("Mogadiscio", new Coordinates(20.0, 95.0), "Africa"),
-                new Port("mascate", new Coordinates(35.0, 108.0), "Africa"),
-                new Port("dubai", new Coordinates(43.0, 105.0), "Africa")
+                // ========== OCEANÍA ==========
+                new Port("Sídney", new Coordinates(-33.8688, 151.2093), "Oceanía"),
+                new Port("Brisbane", new Coordinates(-27.4698, 153.0251), "Oceanía"),
+                new Port("Fremantle", new Coordinates(-32.0564, 115.7417), "Oceanía"),
+                new Port("Darwin", new Coordinates(-12.4634, 130.8456), "Oceanía"),
+                new Port("Port Moresby", new Coordinates(-9.4438, 147.1803), "Oceanía")
         );
         portRepository.saveAll(ports);
     }
 
     private void initRoutes() {
         List<RouteDocument> routes = List.of(
-                // Rutas de Asia
-                new RouteDocument("Tokyo", "Busan", 200.0),
-                new RouteDocument("Shanghai", "Busan", 150.0),
-                new RouteDocument("Shanghai", "Quanzhou", 200.0),
-                new RouteDocument("Hon Kong", "Quanzhou", 100.0),
-                new RouteDocument("Hon Kong", "Singapore", 100.0),
-                new RouteDocument("Singapore", "Chennai", 300.0),
-                new RouteDocument("Singapore", "Yakarta", 200.0),
-                new RouteDocument("Singapore", "Tuticorin", 200.0),
-                new RouteDocument("Chennai", "Tuticorin", 3000.0),
-                new RouteDocument("Mumbai", "Tuticorin", 1200.0),
-                new RouteDocument("Mumbai", "Mascate", 500.0),
-                new RouteDocument("Mumbai", "Dubai", 400.0),
-                new RouteDocument("Aden", "Mascate", 400.0),
-                new RouteDocument("Yakarta", "Darwin", 2000.0),
-                new RouteDocument("Darwin", "Brisbane", 500.0),
-                new RouteDocument("Darwin", "Moresby", 300.0),
-                new RouteDocument("Moresby", "Darwin", 2000.0),
-                new RouteDocument("Moresby", "Brisbane", 2000.0),
-                new RouteDocument("Brisbane", "Sidney", 200.0),
-                new RouteDocument("Brisbane", "Sidney", 200.0),
+                // ========== Rutas Asiáticas ==========
+                new RouteDocument("Tokyo", "Asia", "Busan", "Asia", 1000.0),
+                new RouteDocument("Shanghai", "Asia", "Busan", "Asia", 850.0),
+                new RouteDocument("Shanghai", "Asia", "Quanzhou", "Asia", 700.0),
+                new RouteDocument("Hong Kong", "Asia", "Quanzhou", "Asia", 800.0),
+                new RouteDocument("Hong Kong", "Asia", "Singapore", "Asia", 2600.0),
+                new RouteDocument("Singapore", "Asia", "Chennai", "Asia", 2700.0),
+                new RouteDocument("Singapore", "Asia", "Jakarta", "Asia", 900.0),
+                new RouteDocument("Mumbai", "Asia", "Muscat", "Asia", 1800.0),
+                new RouteDocument("Mumbai", "Asia", "Dubai", "Asia", 1900.0),
+                new RouteDocument("Aden", "Asia", "Muscat", "Asia", 1500.0),
 
-                // Rutas América-Asia
-                new RouteDocument("san francisco", "Tokyo", 5000.0),
-                new RouteDocument("Rio de janeiro", "buenos aires", 200.0),
-                new RouteDocument("Rio de janeiro", "Guayana francesa", 200.0),
-                new RouteDocument("cabello", "Guayana francesa", 200.0),
-                new RouteDocument("cabello", "cartagena", 200.0),
-                new RouteDocument("cartagena", "balboa", 200.0),
-                new RouteDocument("callao", "Valparaiso", 150.0),
-                new RouteDocument("callao", "guayaquil", 200.0),
-                new RouteDocument("guayaquil", "balboa", 250.0),
-                new RouteDocument("balboa", "manzanilla", 500.0),
-                new RouteDocument("manzanilla", "long beach", 200.0),
-                new RouteDocument("long beach", "san francisco", 100.0),
-                new RouteDocument("new york", "fort lauderdale", 200.0),
-                new RouteDocument("balboa", "fort lauderdale", 200.0),
-                new RouteDocument("houston", "balboa", 200.0),
+                // ========== Rutas Oceánicas ==========
+                new RouteDocument("Jakarta", "Asia", "Darwin", "Oceanía", 2700.0),
+                new RouteDocument("Darwin", "Oceanía", "Brisbane", "Oceanía", 3300.0),
+                new RouteDocument("Darwin", "Oceanía", "Port Moresby", "Oceanía", 1800.0),
+                new RouteDocument("Port Moresby", "Oceanía", "Brisbane", "Oceanía", 2500.0),
+                new RouteDocument("Brisbane", "Oceanía", "Sídney", "Oceanía", 900.0),
 
-                // Rutas África-Asia
-                new RouteDocument("toamasina", "Tuticorin", 2000.0),
-                new RouteDocument("toamasina", "mombasa", 200.0),
-                new RouteDocument("toamasina", "durban", 2000.0),
-                new RouteDocument("port-Gentil", "durban", 1000.0),
+                // ========== Rutas Transpacíficas ==========
+                new RouteDocument("San Francisco", "América", "Tokyo", "Asia", 8500.0),
+                new RouteDocument("Tokyo", "Asia", "Balboa", "América", 12500.0),
+                new RouteDocument("Singapore", "Asia", "Valparaíso", "América", 17500.0),
 
-                // Rutas Europa-Asia
-                new RouteDocument("San Petersburgo", "Copenhague", 200.0),
-                new RouteDocument("Copenhague", "Murmansk", 800.0),
-                new RouteDocument("Murmansk", "Arkits", 200.0),
-                new RouteDocument("Uelen", "Arkits", 200.0),
-                new RouteDocument("Uelen", "Tokyo", 200.0),
-                new RouteDocument("eupatoria", "atenas", 200.0),
-                new RouteDocument("genova", "atenas", 200.0),
-                new RouteDocument("genova", "valencia", 200.0),
-                new RouteDocument("le havre", "valencia", 200.0),
-                new RouteDocument("le havre", "hamburg", 200.0),
-                new RouteDocument("Copenhague", "hamburg", 200.0),
-                new RouteDocument("Copenhague", "Stavanger", 200.0),
-                new RouteDocument("Stavanger", "Murmansk", 200.0),
+                // ========== Rutas Americanas ==========
+                new RouteDocument("Balboa", "América", "Guayaquil", "América", 2100.0),
+                new RouteDocument("Guayaquil", "América", "Callao", "América", 1150.0),
+                new RouteDocument("Puerto Cabello", "América", "Cartagena", "América", 200.0),
+                new RouteDocument("San Antonio", "América", "Valparaíso", "América", 1100.0),
+                new RouteDocument("Rio Grande", "América", "Buenos Aires", "América", 800.0),
+                new RouteDocument("Rio de Janeiro", "América", "Buenos Aires", "América", 2000.0),
+                new RouteDocument("Cartagena", "América", "Balboa", "América", 800.0),
+                new RouteDocument("Callao", "América", "Valparaíso", "América", 3500.0),
+                new RouteDocument("Balboa", "América", "Manzanillo", "América", 2700.0),
+                new RouteDocument("Manzanillo", "América", "Long Beach", "América", 2800.0),
+                new RouteDocument("New York", "América", "Fort Lauderdale", "América", 1600.0),
+                new RouteDocument("Vancouver", "América", "San Francisco", "América", 1900.0),
 
-                // Rutas América
-                new RouteDocument("New York", "Portugal", 10000.0),
-                new RouteDocument("Fort Lauderdale", "Panama City", 700.0),
-                new RouteDocument("Fort Lauderdale", "New York", 700.0),
-                new RouteDocument("Cartagena", "Panama City", 100.0),
-                new RouteDocument("Cartagena", "Fort Lauderdale", 200.0),
-                new RouteDocument("Manzanillo", "Panama City", 500.0),
-                new RouteDocument("Cabello", "Cartagena", 100.0),
-                new RouteDocument("Callao", "Guayaquil", 180.0),
-                new RouteDocument("Callao", "San Antonio", 100.0),
-                new RouteDocument("Guayaquil", "Panama City", 180.0),
-                new RouteDocument("Guayana Francesa", "Cabello", 100.0),
-                new RouteDocument("Guayana Francesa", "Rio de Janeiro", 1000.0),
-                new RouteDocument("Rio Grande", "Rio de Janeiro", 100.0),
-                new RouteDocument("Buenos Aires", "Rio Grande", 100.0),
-                new RouteDocument("Rio de Janeiro", "Guayana Francesa", 700.0),
-                new RouteDocument("Montreal", "New York", 100.0),
-                new RouteDocument("Long Beach", "San Francisco", 100.0),
-                new RouteDocument("Long Beach", "Manzanillo", 100.0),
+                // ========== Rutas Transatlánticas ==========
+                new RouteDocument("Rotterdam", "Europa", "New York", "América", 5800.0),
+                new RouteDocument("Lisboa", "Europa", "Rio de Janeiro", "América", 7200.0),
 
-                // Rutas Europa
-                new RouteDocument("Portugal", "Le Havre", 110.0),
-                new RouteDocument("Portugal", "Casablanca", 1000.0),
-                new RouteDocument("Roterdam", "Le Havre", 100.0),
-                new RouteDocument("Roterdam", "Hamburg", 20.0),
-                new RouteDocument("Genova", "Valencia", 500.0),
-                new RouteDocument("Genova", "Atenas", 600.0),
-                new RouteDocument("Estambul", "Atenas", 200.0),
-                new RouteDocument("Estambul", "Constanza", 300.0),
-                new RouteDocument("Estambul", "Eupatoria", 300.0),
-                new RouteDocument("Mersin", "Atenas", 200.0),
-                new RouteDocument("Mersin", "alexandria", 600.0),
-                new RouteDocument("Casablanca", "Valencia", 100.0),
+                // ========== Rutas Europeas ==========
+                new RouteDocument("Stavanger", "Europa", "Murmansk", "Europa", 2800.0),
+                new RouteDocument("Eupatoria", "Europa", "Estambul", "Europa", 800.0),
+                new RouteDocument("Lisboa", "Europa", "Casablanca", "África", 900.0),
+                new RouteDocument("Genova", "Europa", "Atenas", "Europa", 1800.0),
+                new RouteDocument("Hamburgo", "Europa", "Rotterdam", "Europa", 600.0),
+                new RouteDocument("Le Havre", "Europa", "Valencia", "Europa", 1500.0),
+                new RouteDocument("San Petersburgo", "Europa", "Murmansk", "Europa", 1700.0),
 
-                // Rutas África
-                new RouteDocument("Nuakchot", "Casablanca", 200.0),
-                new RouteDocument("Nuakchot", "Dakar", 50.0),
-                new RouteDocument("Dakar", "Abiyan", 100.0),
-                new RouteDocument("Abiyan", "Lagos", 180.0),
-                new RouteDocument("Lagos", "Port-Gentil", 70.0),
-                new RouteDocument("Luanda", "Port-Gentil", 100.0),
-                new RouteDocument("Luanda", "Walbys bay", 200.0),
-                new RouteDocument("Walbys bay", "Durban", 200.0),
-                new RouteDocument("Durban", "Toamasina", 700.0),
-                new RouteDocument("Mombasa", "Toamasina", 250.0),
-                new RouteDocument("Mombasa", "Mogadiscio", 250.0),
-                new RouteDocument("Mogadiscio", "aden", 250.0),
-                new RouteDocument("alexandria", "aden", 300.0),
-                new RouteDocument("alexandria", "Atenas", 250.0),
-                new RouteDocument("mascate", "aden", 250.0),
-                new RouteDocument("mascate", "dubai", 250.0),
+                // ========== Rutas África-Asia ==========
+                new RouteDocument("Mogadishu", "África", "Aden", "Asia", 1500.0),
+                new RouteDocument("Mombasa", "África", "Mumbai", "Asia", 4300.0),
+                new RouteDocument("Durban", "África", "Chennai", "Asia", 6800.0),
 
-                // Ruta especial deshabilitada
-                new RouteDocument("Guayaquil", "Lagos", 0.0) // Distancia 0 para indicar ruta deshabilitada
+                // ========== Rutas Áfricanas ==========
+                new RouteDocument("Walvis Bay", "África", "Luanda", "África", 1800.0), // Corregido nombre
+                new RouteDocument("Mogadishu", "África", "Aden", "Asia", 1200.0), // Nombre corregido
+                new RouteDocument("Ciudad del Cabo", "África", "Walvis Bay", "África", 1300.0), // Nombre corregido
+                new RouteDocument("Dakar", "África", "Casablanca", "África", 2600.0),
+                new RouteDocument("Lagos", "África", "Luanda", "África", 2400.0),
+
+                // ========== Rutas Mediterráneas ==========
+                new RouteDocument("Atenas", "Europa", "Alexandría", "África", 1100.0),
+                new RouteDocument("Estambul", "Europa", "Valencia", "Europa", 2900.0),
+
+                // Rutas Árticas (Uelen/Arkits)
+                new RouteDocument("Uelen", "Asia", "Arkits", "América", 2500.0),
+                new RouteDocument("Uelen", "Asia", "Arkits", "América", 1500.0),
+                new RouteDocument("Murmansk", "Europa", "Arkits", "América", 2200.0)
         );
-
         routeRepository.saveAll(routes);
     }
-}
+
+    private void validateRoutes() {
+        List<RouteDocument> routes = routeRepository.getAll();
+        for (RouteDocument route : routes) {
+            Optional<Port> homePortExists = portRepository.getPortByNameAndContinent(
+                    route.getHomePort(),
+                    route.getHomeContinent()
+            );
+
+            Optional<Port> destinationPortExists = portRepository.getPortByNameAndContinent(
+                    route.getDestinationPort(),
+                    route.getDestinationContinent()
+            );
+
+            if (homePortExists.isEmpty()) {
+                throw new IllegalStateException("Ruta inválida (Home Port doesnt Exists): " + route.getHomePort()
+                        +   "("
+                        +   route.getHomeContinent()
+                        +   ") -> "
+                        +   route.getDestinationPort()
+                        +   "("
+                        +   route.getDestinationContinent()
+                +   ")");
+            }
+
+            if (destinationPortExists.isEmpty()) {
+                throw new IllegalStateException("Ruta inválida (Destination Port doesnt Exists): " + route.getHomePort()
+                        +   "("
+                        +   route.getHomeContinent()
+                        +   ") -> "
+                        +   route.getDestinationPort()
+                        +   "("
+                        +   route.getDestinationContinent()
+                        +   ")");
+            }
+        }
+    }
+}*/
