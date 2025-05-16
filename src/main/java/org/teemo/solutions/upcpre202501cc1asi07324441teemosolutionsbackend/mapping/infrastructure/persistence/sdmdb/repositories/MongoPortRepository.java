@@ -1,6 +1,8 @@
 package org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.infrastructure.persistence.sdmdb.repositories;
 
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.entities.Port;
 
@@ -54,6 +56,10 @@ public class MongoPortRepository implements PortRepository {
 
     @Override
     public Optional<Port> getPortByNameAndContinent(String name, String continent) {
-        return Optional.ofNullable(mongoTemplate.findOne(query(where("name").is(name).and("continent").is(continent)), Port.class));
+        Query query = new Query(
+                Criteria.where("name").is(name)
+                        .and("continent").is(continent)
+        );
+        return Optional.ofNullable(mongoTemplate.findOne(query, Port.class));
     }
 }

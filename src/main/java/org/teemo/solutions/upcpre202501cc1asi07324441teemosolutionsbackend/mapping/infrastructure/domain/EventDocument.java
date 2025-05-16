@@ -3,16 +3,26 @@ package org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapp
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
 
 @Getter
 @Setter
 @Document(collection = "events-documents")
 public class EventDocument extends AuditableAbstractAggregateRoot<EventDocument> {
-    private String id;
 
-    private String puertoOrigen; // Mapea "Puerto Origen"
+    @Field("puertoOrigen") // Mapear campo con espacio
+    private String puertoOrigen;
+
+    @Field("problemaGeopolitico\n")
     private String problemaGeopolitico; // Mapea "Problema Geopolítico"
-    private String eventoMaritimo; // Para "Evento Marítimo"
-    private String esSegura; // Para "¿Es segura o no segura?"
+
+    @Field("descripcion")
+    private String descripcion; // Para "Evento Marítimo"
+
+    // Metodo seguro para acceso a puertoOrigen
+    public String getSafePuertoOrigen() {
+        return (puertoOrigen != null && !puertoOrigen.isBlank()) ?
+                puertoOrigen : "Origen Desconocido";
+    }
 }
