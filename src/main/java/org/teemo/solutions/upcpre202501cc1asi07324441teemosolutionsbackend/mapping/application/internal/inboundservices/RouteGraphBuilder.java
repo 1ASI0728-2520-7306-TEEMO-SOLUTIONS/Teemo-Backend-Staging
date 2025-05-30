@@ -29,12 +29,16 @@ public class RouteGraphBuilder {
         this.navConditions = navConditions;
     }
 
+    // RouteGraphBuilder.java
     public RouteGraph buildDynamicRouteGraph() {
         RouteGraph graph = new RouteGraph();
+
+        // 1. Añadir TODOS los puertos como nodos (incluso sin rutas)
+        List<Port> allPorts = portRepository.getAll();
+        allPorts.forEach(graph::addNode); // Nuevo metodo addNode
+
+        // 2. Procesar rutas para añadir aristas
         List<RouteDocument> routes = routeRepository.getAll();
-
-        logger.info("Construyendo grafo de rutas con {} conexiones", routes.size());
-
         routes.forEach(route -> processRouteDocument(route, graph));
 
         logGraphStatistics(graph);

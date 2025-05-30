@@ -1,4 +1,4 @@
-/*package org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.infrastructure.persistence.sdmdb;
+package org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.infrastructure.persistence.sdmdb;
 
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -143,6 +143,9 @@ public class DataInitializer {
                 new RouteDocument("Singapore", "Asia", "Valparaíso", "América", 17500.0),
 
                 // ========== Rutas Americanas ==========
+                new RouteDocument("San Francisco", "América", "Balboa", "América", 3200.0),
+                new RouteDocument("San Francisco", "América", "Manzanillo", "América", 2100.0),
+                new RouteDocument("Long Beach", "América", "San Francisco", "América", 400.0),
                 new RouteDocument("Balboa", "América", "Guayaquil", "América", 2100.0),
                 new RouteDocument("Guayaquil", "América", "Callao", "América", 1150.0),
                 new RouteDocument("Puerto Cabello", "América", "Cartagena", "América", 200.0),
@@ -150,11 +153,13 @@ public class DataInitializer {
                 new RouteDocument("Rio Grande", "América", "Buenos Aires", "América", 800.0),
                 new RouteDocument("Rio de Janeiro", "América", "Buenos Aires", "América", 2000.0),
                 new RouteDocument("Cartagena", "América", "Balboa", "América", 800.0),
-                new RouteDocument("Callao", "América", "Valparaíso", "América", 3500.0),
+                new RouteDocument("Callao", "América", "Valparaíso", "América", 1500.0),
                 new RouteDocument("Balboa", "América", "Manzanillo", "América", 2700.0),
                 new RouteDocument("Manzanillo", "América", "Long Beach", "América", 2800.0),
                 new RouteDocument("New York", "América", "Fort Lauderdale", "América", 1600.0),
                 new RouteDocument("Vancouver", "América", "San Francisco", "América", 1900.0),
+                new RouteDocument("Houston", "América", "New York", "América", 2500.0),
+                new RouteDocument("Prince Rupert", "América", "Vancouver", "América", 800.0),
 
                 // ========== Rutas Transatlánticas ==========
                 new RouteDocument("Rotterdam", "Europa", "New York", "América", 5800.0),
@@ -187,7 +192,6 @@ public class DataInitializer {
 
                 // Rutas Árticas (Uelen/Arkits)
                 new RouteDocument("Uelen", "Asia", "Arkits", "América", 2500.0),
-                new RouteDocument("Uelen", "Asia", "Arkits", "América", 1500.0),
                 new RouteDocument("Murmansk", "Europa", "Arkits", "América", 2200.0)
         );
         routeRepository.saveAll(routes);
@@ -229,4 +233,4 @@ public class DataInitializer {
             }
         }
     }
-}*/
+}

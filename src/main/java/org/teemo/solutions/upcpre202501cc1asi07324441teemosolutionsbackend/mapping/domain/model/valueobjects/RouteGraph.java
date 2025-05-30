@@ -9,12 +9,18 @@ public class RouteGraph {
     private final Map<Port, List<RouteEdge>> adjacencyList = new HashMap<>();
 
     public boolean containsNode(Port port) {
-        return adjacencyList.containsKey(port);
+        return !adjacencyList.containsKey(port);
     }
 
     public List<RouteEdge> getAdjacentEdges(Port port) {
         return adjacencyList.getOrDefault(port, Collections.emptyList());
     }
+
+    public void addNode(Port port) {
+        adjacencyList.putIfAbsent(port, new ArrayList<>());
+    }
+
+
     public void addEdge(Port source, RouteEdge edge) {
         adjacencyList.computeIfAbsent(source, k -> new ArrayList<>()).add(edge);
     }

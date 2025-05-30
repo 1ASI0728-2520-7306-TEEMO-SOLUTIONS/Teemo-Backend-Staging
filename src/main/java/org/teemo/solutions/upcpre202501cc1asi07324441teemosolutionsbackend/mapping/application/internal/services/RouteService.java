@@ -1,10 +1,13 @@
 package org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.application.internal.services;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.application.internal.exceptionhandlers.PortNotFoundException;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.aggregates.SafetyValidator;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.entities.Port;
+import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.valueobjects.GeoUtils;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.services.RouteCalculatorService;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.infrastructure.domain.RouteDocument;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.infrastructure.persistence.sdmdb.repositories.MongoPortRepository;
@@ -19,6 +22,7 @@ import java.util.stream.Collectors;
 @Service
 public class RouteService {
 
+    private final Logger logger = LoggerFactory.getLogger(RouteService.class);
     private final MongoRouteRepository routeRepository;
     private final MongoPortRepository portRepository;
     private final RouteCalculatorService routeCalculatorService;
@@ -75,15 +79,35 @@ public class RouteService {
 
     public double calculateTotalDistance(List<Port> route) {
         double total = 0.0;
+        GeoUtils geoUtils = new GeoUtils(); // Inyectar o instanciar
+
         for (int i = 0; i < route.size() - 1; i++) {
-            String current = route.get(i).getName();
-            String next = route.get(i + 1).getName();
+            Port currentPort = route.get(i);
+            Port nextPort = route.get(i + 1);
 
-            RouteDocument calculateDistancePort = routeRepository.getBetweenPorts(current, next);
+            try {
+                // 1. Intenta obtener ruta documentada
+                RouteDocument routeDoc = routeRepository.getBetweenPorts(
+                        currentPort.getName(),
+                        nextPort.getName()
+                );
 
-            Double distance = calculateDistancePort.getDistance();
-
-            total += distance;
+                if (routeDoc != null) {
+                    total += routeDoc.getDistance();
+                } else {
+                    // 2. Calcula distancia Haversine si no existe ruta registrada
+                    double distance = geoUtils.calculateHaversineDistance(currentPort, nextPort);
+                    logger.warn("Usando distancia estimada entre {} y {}: {} mn",
+                            currentPort.getName(), nextPort.getName(), distance);
+                    total += distance;
+                }
+            } catch (Exception e) {
+                // 3. Fallback a cálculo geográfico
+                double distance = geoUtils.calculateHaversineDistance(currentPort, nextPort);
+                total += distance;
+                logger.error("Error calculando ruta entre {} y {}: {}",
+                        currentPort.getName(), nextPort.getName(), e.getMessage());
+            }
         }
         return total;
     }

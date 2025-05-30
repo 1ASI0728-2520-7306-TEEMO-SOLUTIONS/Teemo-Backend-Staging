@@ -52,11 +52,11 @@ public class AStarPathfinder {
     }
 
     private void validateInputs(Port start, Port end, RouteGraph graph) {
-        if (!graph.containsNode(start)) {
+        if (graph.containsNode(start)) {
             logger.error("Puerto inicial no existe en el grafo: {}", start.getName());
             throw new RouteNotFoundException("Puerto inicial no tiene rutas: " + start.getName());
         }
-        if (!graph.containsNode(end)) {
+        if (graph.containsNode(end)) {
             logger.error("Puerto final no existe en el grafo: {}", end.getName());
             throw new RouteNotFoundException("Puerto final no tiene rutas: " + end.getName());
         }
@@ -91,10 +91,18 @@ public class AStarPathfinder {
 
     private double calculateHeuristic(Port current, Port target) {
         double baseDistance = geoUtils.calculateHaversineDistance(current, target);
-        double safetyFactor = calculateSafetyFactor(current, target);
-        double currentEffects = calculateCurrentEffects(current, target);
 
-        return (baseDistance * 0.95) + safetyFactor - currentEffects;
+        // Penaliza rutas que cruzan continentes innecesariamente
+        double continentPenalty = current.getContinent().equals(target.getContinent())
+                ? 0.9   // Mismo continente: bonificación
+                : 1.5;  // Distinto continente: penalización
+
+        // Penaliza rutas que cruzan el ecuador
+        double hemisphereFactor = (current.getCoordinates().latitude() * target.getCoordinates().latitude() > 0)
+                ? 1.0   // Mismo hemisferio
+                : 1.2;  // Cruce de hemisferios
+
+        return baseDistance * continentPenalty * hemisphereFactor;
     }
 
     private double calculateSafetyFactor(Port a, Port b) {
