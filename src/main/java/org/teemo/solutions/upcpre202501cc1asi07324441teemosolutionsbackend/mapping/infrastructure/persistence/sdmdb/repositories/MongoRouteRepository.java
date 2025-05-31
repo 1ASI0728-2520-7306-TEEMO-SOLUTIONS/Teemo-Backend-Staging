@@ -42,4 +42,12 @@ public class MongoRouteRepository implements RouteRepository {
     public List<RouteDocument> getAll() {
         return mongoTemplate.findAll(RouteDocument.class);
     }
+
+    @Override
+    public boolean existsByHomePortAndDestinationPort(String homePort, String destinationPort) {
+        Criteria criteria = Criteria.where("Home Port").is(homePort)
+                .and("Destination Port").is(destinationPort);
+        Query query = Query.query(criteria);
+        return mongoTemplate.exists(query, RouteDocument.class);
+    }
 }

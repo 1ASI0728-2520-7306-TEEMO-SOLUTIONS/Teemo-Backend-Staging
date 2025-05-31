@@ -62,4 +62,13 @@ public class MongoPortRepository implements PortRepository {
         );
         return Optional.ofNullable(mongoTemplate.findOne(query, Port.class));
     }
+
+    @Override
+    public boolean existsByNameAndContinent(String name, String continent) {
+        Query query = new Query(
+                Criteria.where("name").is(name)
+                        .and("continent").is(continent)
+        );
+        return mongoTemplate.exists(query, Port.class);
+    }
 }

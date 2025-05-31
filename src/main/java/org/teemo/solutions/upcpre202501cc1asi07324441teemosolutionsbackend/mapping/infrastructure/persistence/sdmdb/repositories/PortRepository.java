@@ -14,4 +14,6 @@ public interface PortRepository {
     List<Port> findByName(String name);
     void saveAll(List<Port> ports);
     Optional<Port> getPortByNameAndContinent(String name, String continent);
+
+    boolean existsByNameAndContinent(String name, String continent);
 }

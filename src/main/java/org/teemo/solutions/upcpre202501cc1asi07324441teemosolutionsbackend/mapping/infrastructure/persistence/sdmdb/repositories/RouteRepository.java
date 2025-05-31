@@ -12,4 +12,6 @@ public interface RouteRepository{
     void saveAll(List<RouteDocument> routes);
     List<RouteDocument> getAll();
 
+    boolean existsByHomePortAndDestinationPort(
+            String homePort, String destinationPort);
 }
