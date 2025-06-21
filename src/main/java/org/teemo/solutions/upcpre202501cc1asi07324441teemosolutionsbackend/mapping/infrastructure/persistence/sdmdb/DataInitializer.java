@@ -179,10 +179,15 @@ public class DataInitializer {
                     new RouteDocument("Rio de Janeiro", "América", "Buenos Aires", "América", 2000.0),
                     new RouteDocument("Cartagena", "América", "Balboa", "América", 800.0),
                     new RouteDocument("Callao", "América", "Valparaíso", "América", 1500.0),
+                    new RouteDocument("Valparaíso", "América", "Buenos Aires", "América", 2200.0),
+
                     new RouteDocument("Balboa", "América", "Manzanillo", "América", 2700.0),
                     new RouteDocument("Manzanillo", "América", "Long Beach", "América", 2800.0),
                     new RouteDocument("New York", "América", "Fort Lauderdale", "América", 1600.0),
                     new RouteDocument("Vancouver", "América", "San Francisco", "América", 1900.0),
+                    new RouteDocument("Buenos Aires", "América", "Rio de Janeiro", "América", 2000.0),
+                    new RouteDocument("Rio de Janeiro", "América", "Rio Grande", "América", 800.0),
+
                     new RouteDocument("Houston", "América", "New York", "América", 2500.0),
                     new RouteDocument("Prince Rupert", "América", "Vancouver", "América", 800.0),
 

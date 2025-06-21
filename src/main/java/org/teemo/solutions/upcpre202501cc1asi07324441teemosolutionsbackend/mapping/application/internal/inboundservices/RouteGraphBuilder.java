@@ -11,8 +11,6 @@ import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mappi
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.infrastructure.persistence.sdmdb.repositories.MongoPortRepository;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.infrastructure.persistence.sdmdb.repositories.MongoRouteRepository;
 
-import java.util.List;
-
 @Component
 public class RouteGraphBuilder {
     private static final Logger logger = LoggerFactory.getLogger(RouteGraphBuilder.class);
@@ -33,15 +31,30 @@ public class RouteGraphBuilder {
     public RouteGraph buildDynamicRouteGraph() {
         RouteGraph graph = new RouteGraph();
 
-        // 1. Añadir TODOS los puertos como nodos (incluso sin rutas)
-        List<Port> allPorts = portRepository.getAll();
-        allPorts.forEach(graph::addNode); // Nuevo metodo addNode
+        // 1. Añadir TODOS los puertos como nodos
+        portRepository.getAll().forEach(graph::addNode);
 
-        // 2. Procesar rutas para añadir aristas
-        List<RouteDocument> routes = routeRepository.getAll();
-        routes.forEach(route -> processRouteDocument(route, graph));
+        // 2. Procesar rutas existentes
+        routeRepository.getAll().forEach(route -> {
+            try {
+                Port origin = portRepository.getPortByNameAndContinent(
+                                route.getHomePort(), route.getHomeContinent())
+                        .orElseThrow();
 
-        logGraphStatistics(graph);
+                Port destination = portRepository.getPortByNameAndContinent(
+                                route.getDestinationPort(), route.getDestinationContinent())
+                        .orElseThrow();
+
+                // 3. Añadir conexión bidireccional
+                graph.addEdge(origin, new RouteEdge(destination, route.getDistance()));
+                graph.addEdge(destination, new RouteEdge(origin, route.getDistance()));
+
+            } catch (Exception e) {
+                logger.warn("Ruta omitida: {} -> {}: {}",
+                        route.getHomePort(), route.getDestinationPort(), e.getMessage());
+            }
+        });
+
         return graph;
     }
 
@@ -51,7 +64,6 @@ public class RouteGraphBuilder {
             Port destination = getValidPort(route.getDestinationPort(), route.getDestinationContinent());
 
             addDynamicEdgePair(graph, origin, destination, route.getDistance());
-            logRouteAddition(origin, destination, route.getDistance());
 
         } catch (PortNotFoundException e) {
             logger.warn("Omisión de ruta: {}", e.getMessage());
@@ -77,15 +89,4 @@ public class RouteGraphBuilder {
         return new RouteEdge(edge.getDestination(), adjustedDistance);
     }
 
-    private void logRouteAddition(Port origin, Port destination, double distance) {
-        logger.debug("Conexión añadida: {} [{}] ↔ {} [{}] | Distancia base: {} mn",
-                origin.getName(), origin.getContinent(),
-                destination.getName(), destination.getContinent(),
-                distance);
-    }
-
-    private void logGraphStatistics(RouteGraph graph) {
-        logger.info("Grafo construido - Nodos: {}, Aristas: {}",
-                graph.getNodeCount(), graph.getEdgeCount());
-    }
 }
