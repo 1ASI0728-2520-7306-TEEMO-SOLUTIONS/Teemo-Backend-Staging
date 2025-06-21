@@ -1,1 +1,4 @@
+# Ensure shell scripts have LF line endings
+*.sh text eol=lf
+mvnw text eol=lf
 *.onnx filter=lfs diff=lfs merge=lfs -text
