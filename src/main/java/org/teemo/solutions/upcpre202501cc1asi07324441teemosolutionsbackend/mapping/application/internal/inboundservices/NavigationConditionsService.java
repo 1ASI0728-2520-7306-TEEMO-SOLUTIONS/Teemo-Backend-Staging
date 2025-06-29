@@ -4,21 +4,33 @@ import org.springframework.stereotype.Service;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.entities.Port;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.entities.RouteEdge;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.valueobjects.Coordinates;
+import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.services.NavigationConditionsProvider;
 
 import java.time.Month;
 import java.time.LocalDate;
 
 @Service
-public class NavigationConditionsService {
+public class NavigationConditionsService implements NavigationConditionsProvider {
 
     private static final double MONSOON_ADJUSTMENT = 0.2;
     private static final double ARCTIC_ICE_PENALTY = 1500;
 
-    public double applyEnvironmentalFactors(RouteEdge edge, Port currentPort) {
+    @Override
+    public double getAdjustedCost(RouteEdge edge, Port currentPort) {
         double baseDistance = edge.getDistance();
         return baseDistance +
                 calculateMonsoonAdjustment(currentPort, baseDistance) +
                 calculateArcticPenalty(edge);
+    }
+
+    @Override // <-- Añade @Override
+    public boolean isAlongFavorableCurrent(Port a, Port b) {
+        return isInKuroshioCurrent(a) && isDirectionEast(a, b);
+    }
+
+    @Override // <-- Añade @Override
+    public boolean isAgainstStrongCurrent(Port a, Port b) {
+        return isInGulfStreamArea(a) && isDirectionWest(a, b);
     }
 
     private double calculateMonsoonAdjustment(Port port, double baseDistance) {
@@ -56,13 +68,7 @@ public class NavigationConditionsService {
         return currentMonth == Month.JUNE || currentMonth == Month.JULY;
     }
 
-    public boolean isAlongFavorableCurrent(Port a, Port b) {
-        return isInKuroshioCurrent(a) && isDirectionEast(a, b);
-    }
 
-    public boolean isAgainstStrongCurrent(Port a, Port b) {
-        return isInGulfStreamArea(a) && isDirectionWest(a, b);
-    }
 
     private boolean isInKuroshioCurrent(Port port) {
         return port.getCoordinates().longitude() > 130 &&

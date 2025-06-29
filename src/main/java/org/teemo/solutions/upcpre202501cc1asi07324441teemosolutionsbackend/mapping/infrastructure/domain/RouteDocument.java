@@ -12,21 +12,24 @@ import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.share
 @Document(collection = "routes-documents")
 @CompoundIndex(name = "unique_route", def = "{'homePort': 1, 'destinationPort': 1}", unique = true)
 public class RouteDocument extends AuditableAbstractAggregateRoot<RouteDocument> {
-    @Field("Home Port")
+
+    // Nombres de campo corregidos a camelCase
+    @Field("homePort")
     private String homePort;
 
-    @Field("Home Continent")
+    @Field("homeContinent")
     private String homeContinent;
 
-    @Field("Destination Port")
+    @Field("destinationPort")
     private String destinationPort;
 
-    @Field("Destination Continent")
+    @Field("destinationContinent")
     private String destinationContinent;
 
-    @Field("Distance")
+    @Field("distance")
     private Double distance;
 
+    // Actualiza el constructor para que coincida
     public RouteDocument(String homePort, String homeContinent, String destinationPort, String destinationContinent, Double distance) {
         this.homePort = homePort;
         this.homeContinent = homeContinent;
@@ -34,4 +37,8 @@ public class RouteDocument extends AuditableAbstractAggregateRoot<RouteDocument>
         this.destinationContinent = destinationContinent;
         this.distance = distance;
     }
+
+    // Si los campos en Java coinciden con los de la BD, la anotación @Field es opcional.
+    // Podrías incluso eliminarla para mayor limpieza. Por ejemplo:
+    // private String homePort; // Spring Data lo mapeará a "homePort" por defecto.
 }

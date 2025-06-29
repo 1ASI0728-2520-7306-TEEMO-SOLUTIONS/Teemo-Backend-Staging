@@ -7,13 +7,12 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PortRepository {
-    void eliminatePort(String id);
     Port savePort(Port port);
+    void saveAll(List<Port> ports);
+    void eliminatePort(String id);
+    List<Port> findByName(String name);
     Optional<Port> findById(String id);
     List<Port> getAll();
-    List<Port> findByName(String name);
-    void saveAll(List<Port> ports);
     Optional<Port> getPortByNameAndContinent(String name, String continent);
-
     boolean existsByNameAndContinent(String name, String continent);
 }

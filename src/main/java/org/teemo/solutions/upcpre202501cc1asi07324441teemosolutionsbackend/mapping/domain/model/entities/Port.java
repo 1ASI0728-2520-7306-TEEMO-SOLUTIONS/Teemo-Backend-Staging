@@ -2,29 +2,30 @@
 package org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.entities;
 
 import lombok.Getter;
-import org.springframework.data.annotation.PersistenceConstructor;
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.valueobjects.Coordinates;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
 
 import java.util.Objects;
 
 @Getter
-@Document(collection = "ports")
+// Elimina @Document(collection = "ports")
 public class Port extends AuditableAbstractAggregateRoot<Port> {
-    private  String name; // Eliminar final
-    private  Coordinates coordinates; // Eliminar final
-    private  String continent; // Eliminar final
+    private String name;
+    private Coordinates coordinates;
+    private String continent;
 
-    @PersistenceConstructor
+    // El constructor con @PersistenceConstructor ya no es necesario para el dominio.
+    // Podemos tener un único constructor que asegure la consistencia.
     public Port(String name, Coordinates coordinates, String continent) {
         this.name = name;
         this.coordinates = coordinates;
         this.continent = continent;
     }
 
-    public Port() {} // Constructor vacío requerido
-
+    // Este constructor vacío es para frameworks, pero si el dominio es puro,
+    // podríamos incluso eliminarlo si no lo necesita ningún otro componente del dominio.
+    // Por ahora, lo mantenemos por si algún serializador lo requiere.
+    public Port() {}
 
     @Override
     public boolean equals(Object o) {

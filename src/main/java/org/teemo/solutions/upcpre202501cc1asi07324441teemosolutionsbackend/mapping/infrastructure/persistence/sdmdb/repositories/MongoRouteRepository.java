@@ -33,8 +33,11 @@ public class MongoRouteRepository implements RouteRepository {
 
     @Override
     public void saveAll(List<RouteDocument> routes) {
-        for (RouteDocument route : routes) {
-            mongoTemplate.save(route);
+        // Inserta todos los documentos en una sola operación de lote.
+        // Se añade una comprobación para evitar enviar una lista vacía.
+        if (routes != null && !routes.isEmpty()) {
+            mongoTemplate.insert(routes, RouteDocument.class);
+            // Alternativamente: mongoTemplate.insertAll(routes);
         }
     }
 

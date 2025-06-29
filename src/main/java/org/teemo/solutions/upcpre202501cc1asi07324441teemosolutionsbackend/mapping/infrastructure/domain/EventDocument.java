@@ -11,14 +11,15 @@ import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.share
 @Document(collection = "events-documents")
 public class EventDocument extends AuditableAbstractAggregateRoot<EventDocument> {
 
-    @Field("puertoOrigen") // Mapear campo con espacio
-    private String puertoOrigen;
+    @Field("puertoOrigen")
+    private String puertoOrigen; // "puertoOrigen" es aceptable, aunque "originPort" sería más estándar en inglés
 
-    @Field("problemaGeopolitico\n")
-    private String problemaGeopolitico; // Mapea "Problema Geopolítico"
+    // Corregido: eliminado el "\n"
+    @Field("problemaGeopolitico")
+    private String problemaGeopolitico;
 
     @Field("descripcion")
-    private String descripcion; // Para "Evento Marítimo"
+    private String descripcion;
 
     // Metodo seguro para acceso a puertoOrigen
     public String getSafePuertoOrigen() {

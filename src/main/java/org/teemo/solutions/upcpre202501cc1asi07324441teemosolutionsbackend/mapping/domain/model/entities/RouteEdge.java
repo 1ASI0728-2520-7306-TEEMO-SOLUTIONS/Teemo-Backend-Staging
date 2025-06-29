@@ -1,19 +1,25 @@
 package org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.entities;
 
 import lombok.Getter;
-import lombok.Setter;
-import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
+// No necesita @Setter si la hacemos inmutable, lo cual es preferible.
 
+// Ya no extiende AuditableAbstractAggregateRoot
 @Getter
-@Setter
-public class RouteEdge extends AuditableAbstractAggregateRoot<RouteEdge> {
-    private Port source;
-    private Port destination;
-    private double distance;
-    private double curvature;
-    private String direction;
+public class RouteEdge {
+    private final Port source;
+    private final Port destination;
+    private final double distance;
 
-    public RouteEdge(Port destination, Double distance) {
+    // Opcional: otros atributos como curvature y direction, si se usan.
+    // private double curvature;
+    // private String direction;
+
+    // El constructor ahora es completo y correcto.
+    public RouteEdge(Port source, Port destination, double distance) {
+        if (source == null || destination == null) {
+            throw new IllegalArgumentException("Source and destination ports cannot be null.");
+        }
+        this.source = source;
         this.destination = destination;
         this.distance = distance;
     }

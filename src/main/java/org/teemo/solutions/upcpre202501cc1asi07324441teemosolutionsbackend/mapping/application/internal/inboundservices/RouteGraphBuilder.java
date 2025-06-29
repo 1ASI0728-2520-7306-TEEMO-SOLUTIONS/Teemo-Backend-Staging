@@ -3,9 +3,9 @@ package org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapp
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.application.internal.exceptionhandlers.PortNotFoundException;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.entities.Port;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.entities.RouteEdge;
+import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.exceptions.PortNotFoundException;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.valueobjects.RouteGraph;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.infrastructure.domain.RouteDocument;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.infrastructure.persistence.sdmdb.repositories.MongoPortRepository;
@@ -30,31 +30,8 @@ public class RouteGraphBuilder {
     // RouteGraphBuilder.java
     public RouteGraph buildDynamicRouteGraph() {
         RouteGraph graph = new RouteGraph();
-
-        // 1. Añadir TODOS los puertos como nodos
         portRepository.getAll().forEach(graph::addNode);
-
-        // 2. Procesar rutas existentes
-        routeRepository.getAll().forEach(route -> {
-            try {
-                Port origin = portRepository.getPortByNameAndContinent(
-                                route.getHomePort(), route.getHomeContinent())
-                        .orElseThrow();
-
-                Port destination = portRepository.getPortByNameAndContinent(
-                                route.getDestinationPort(), route.getDestinationContinent())
-                        .orElseThrow();
-
-                // 3. Añadir conexión bidireccional
-                graph.addEdge(origin, new RouteEdge(destination, route.getDistance()));
-                graph.addEdge(destination, new RouteEdge(origin, route.getDistance()));
-
-            } catch (Exception e) {
-                logger.warn("Ruta omitida: {} -> {}: {}",
-                        route.getHomePort(), route.getDestinationPort(), e.getMessage());
-            }
-        });
-
+        routeRepository.getAll().forEach(routeDoc -> processRouteDocument(routeDoc, graph));
         return graph;
     }
 
@@ -63,6 +40,8 @@ public class RouteGraphBuilder {
             Port origin = getValidPort(route.getHomePort(), route.getHomeContinent());
             Port destination = getValidPort(route.getDestinationPort(), route.getDestinationContinent());
 
+            // La distancia en el grafo será la distancia base.
+            // Los ajustes se aplicarán dinámicamente en A*.
             addDynamicEdgePair(graph, origin, destination, route.getDistance());
 
         } catch (PortNotFoundException e) {
@@ -77,16 +56,13 @@ public class RouteGraphBuilder {
     }
 
     private void addDynamicEdgePair(RouteGraph graph, Port a, Port b, double baseDistance) {
-        RouteEdge abEdge = new RouteEdge(b, baseDistance);
-        RouteEdge baEdge = new RouteEdge(a, baseDistance);
+        // Crea las aristas una sola vez
+        RouteEdge abEdge = new RouteEdge(a, b, baseDistance);
+        RouteEdge baEdge = new RouteEdge(b, a, baseDistance);
 
-        graph.addEdge(a, applyEnvironmentalFactors(abEdge, a));
-        graph.addEdge(b, applyEnvironmentalFactors(baEdge, b));
-    }
-
-    private RouteEdge applyEnvironmentalFactors(RouteEdge edge, Port origin) {
-        double adjustedDistance = navConditions.applyEnvironmentalFactors(edge, origin);
-        return new RouteEdge(edge.getDestination(), adjustedDistance);
+        // Añade las aristas al grafo. El coste será calculado en tiempo de ejecución por A*
+        graph.addEdge(a, abEdge);
+        graph.addEdge(b, baEdge);
     }
 
 }
