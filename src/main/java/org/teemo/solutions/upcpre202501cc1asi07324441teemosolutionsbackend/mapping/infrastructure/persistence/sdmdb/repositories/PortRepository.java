@@ -1,18 +1,18 @@
 // PortRepository.java
 package org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.infrastructure.persistence.sdmdb.repositories;
 
-import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.entities.Port;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
+import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.infrastructure.persistence.sdmdb.documents.PortDocument;
 
-import java.util.List;
 import java.util.Optional;
 
-public interface PortRepository {
-    Port savePort(Port port);
-    void saveAll(List<Port> ports);
-    void eliminatePort(String id);
-    List<Port> findByName(String name);
-    Optional<Port> findById(String id);
-    List<Port> getAll();
-    Optional<Port> getPortByNameAndContinent(String name, String continent);
+@Repository
+public interface PortRepository extends MongoRepository<PortDocument, String> {
+
+    Optional<PortDocument> findByNameAndContinent(String name, String continent);
+    void deleteById(String id);
+    Optional<PortDocument> findByName(String name);
     boolean existsByNameAndContinent(String name, String continent);
+    void deleteAll();
 }

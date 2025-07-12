@@ -1,17 +1,15 @@
-// RouteRepository.java
 package org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.infrastructure.persistence.sdmdb.repositories;
 
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
+import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.infrastructure.persistence.sdmdb.documents.RouteDocument;
 
-import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.infrastructure.domain.RouteDocument;
+import java.util.Optional;
 
-import java.util.List;
+@Repository
+public interface RouteRepository extends MongoRepository<RouteDocument, String> {
 
-public interface RouteRepository{
-
-    RouteDocument getBetweenPorts(String homePort, String destinationPort);
-    void saveAll(List<RouteDocument> routes);
-    List<RouteDocument> getAll();
-
-    boolean existsByHomePortAndDestinationPort(
-            String homePort, String destinationPort);
+    boolean existsByHomePortAndDestinationPort(String homePort, String destinationPort);
+    Optional<RouteDocument> findByHomePortAndDestinationPort(String homePort, String destinationPort);
+    void deleteAll();
 }

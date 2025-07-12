@@ -4,45 +4,53 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.entities.Port;
-import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.entities.RouteEdge;
+import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.entities.Route;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.exceptions.PortNotFoundException;
+import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.valueobjects.Coordinates;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.valueobjects.RouteGraph;
-import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.infrastructure.domain.RouteDocument;
-import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.infrastructure.persistence.sdmdb.repositories.MongoPortRepository;
-import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.infrastructure.persistence.sdmdb.repositories.MongoRouteRepository;
+import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.infrastructure.persistence.sdmdb.documents.RouteDocument;
+import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.infrastructure.persistence.sdmdb.repositories.PortRepository;
+import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.infrastructure.persistence.sdmdb.repositories.RouteRepository;
 
 @Component
 public class RouteGraphBuilder {
     private static final Logger logger = LoggerFactory.getLogger(RouteGraphBuilder.class);
 
-    private final MongoRouteRepository routeRepository;
-    private final MongoPortRepository portRepository;
+    private final RouteRepository routeRepository;
+    private final PortRepository portRepository;
     private final NavigationConditionsService navConditions;
 
-    public RouteGraphBuilder(MongoRouteRepository routeRepository,
-                             MongoPortRepository portRepository,
-                             NavigationConditionsService navConditions) {
-        this.routeRepository = routeRepository;
-        this.portRepository = portRepository;
-        this.navConditions = navConditions;
+    public RouteGraphBuilder(RouteRepository _routeRepository,
+                             PortRepository _portRepository,
+                             NavigationConditionsService _navConditions) {
+        this.routeRepository = _routeRepository;
+        this.portRepository = _portRepository;
+        this.navConditions = _navConditions;
     }
 
-    // RouteGraphBuilder.java
     public RouteGraph buildDynamicRouteGraph() {
         RouteGraph graph = new RouteGraph();
-        portRepository.getAll().forEach(graph::addNode);
-        routeRepository.getAll().forEach(routeDoc -> processRouteDocument(routeDoc, graph));
+        // Carga las rutas desde la base de datos
+        routeRepository.findAll().forEach(route -> {
+            try {
+                processRouteDocument(route, graph);
+            } catch (PortNotFoundException e) {
+                logger.warn("Omisión de ruta: {}", e.getMessage());
+            }
+        });
         return graph;
     }
 
     private void processRouteDocument(RouteDocument route, RouteGraph graph) {
         try {
-            Port origin = getValidPort(route.getHomePort(), route.getHomeContinent());
-            Port destination = getValidPort(route.getDestinationPort(), route.getDestinationContinent());
-
-            // La distancia en el grafo será la distancia base.
-            // Los ajustes se aplicarán dinámicamente en A*.
+            Port origin = getValidPort(route.getHomePort(), route.getHomePortContinent());
+            Port destination = getValidPort(route.getDestinationPort(), route.getDestinationPortContinent());
             addDynamicEdgePair(graph, origin, destination, route.getDistance());
+
+            logger.info("Añadiendo al grafo: Puerto Origen='{}', Continente='{}', HashCode={}",
+                    origin.getName(), origin.getContinent(), origin.hashCode());
+            logger.info("Añadiendo al grafo: Puerto Destino='{}', Continente='{}', HashCode={}",
+                    destination.getName(), destination.getContinent(), destination.hashCode());
 
         } catch (PortNotFoundException e) {
             logger.warn("Omisión de ruta: {}", e.getMessage());
@@ -50,19 +58,24 @@ public class RouteGraphBuilder {
     }
 
     private Port getValidPort(String name, String continent) {
-        return portRepository.getPortByNameAndContinent(name, continent)
-                .orElseThrow(() -> new PortNotFoundException(
-                        "Puerto no encontrado: %s (%s)".formatted(name, continent)));
+        return portRepository.findByNameAndContinent(name, continent)
+                .map(portDocument -> new Port(
+                        portDocument.getName(),
+                        new Coordinates(
+                                portDocument.getCoordinates().getLatitude(),
+                                portDocument.getCoordinates().getLongitude()
+                        ),
+                        portDocument.getContinent()
+                ))
+                .orElseThrow(() -> new PortNotFoundException("Port not found: " + name + " in continent: " + continent));
     }
 
     private void addDynamicEdgePair(RouteGraph graph, Port a, Port b, double baseDistance) {
-        // Crea las aristas una sola vez
-        RouteEdge abEdge = new RouteEdge(a, b, baseDistance);
-        RouteEdge baEdge = new RouteEdge(b, a, baseDistance);
+        // Crea la ruta en UNA SOLA dirección.
+        Route route = new Route(a, b, baseDistance);
 
-        // Añade las aristas al grafo. El coste será calculado en tiempo de ejecución por A*
-        graph.addEdge(a, abEdge);
-        graph.addEdge(b, baEdge);
+        // La clase RouteGraph se encarga de hacerla bidireccional.
+        // Solo se necesita esta llamada.
+        graph.addEdge(route);
     }
-
 }

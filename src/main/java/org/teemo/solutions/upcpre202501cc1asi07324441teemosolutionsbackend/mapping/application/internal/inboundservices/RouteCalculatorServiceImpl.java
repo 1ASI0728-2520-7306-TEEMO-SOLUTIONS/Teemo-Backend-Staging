@@ -21,6 +21,7 @@ public class RouteCalculatorServiceImpl implements RouteCalculatorService {
     @Override
     public List<Port> calculateOptimalRoute(Port start, Port end) {
         RouteGraph graph = graphBuilder.buildDynamicRouteGraph();
+        graph.logAllNodes();
         return pathfinder.findOptimalRoute(start, end, graph);
     }
 }

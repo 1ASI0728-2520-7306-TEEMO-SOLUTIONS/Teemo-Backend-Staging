@@ -27,7 +27,14 @@ public class MongoEventRepository implements EventRepository {
                         Criteria.where("puertoOrigen").ne(null),
                         Criteria.where("puertoOrigen").ne("")
                 ));
-
         return mongoTemplate.find(query, EventDocument.class, COLLECTION_NAME);
+    }
+
+    public List<String> findDistinctOriginPorts() {
+        // Usa el nuevo nombre de campo "originPort"
+        Query query = new Query(Criteria.where("puertoOrigen").exists(true).ne("").ne(null));
+
+        // Usa el nuevo nombre de campo "originPort"
+        return mongoTemplate.findDistinct(query, "puertoOrigen", COLLECTION_NAME, String.class);
     }
 }
