@@ -78,6 +78,9 @@ public class DataInitializer {
                     new Port("Aden", new Coordinates(12.8000, 45.0333), "Asia"),
                     new Port("Vladivostok", new Coordinates(43.1056, 131.8735), "Asia"),
                     new Port("Uelen", new Coordinates(66.1667, -169.8000), "Asia"),
+                    new Port("Macasar", new Coordinates(-5.112648, 119.409072), "Asia"),//hacer ruta no te olvides
+                    new Port("Muara Port", new Coordinates(5.024628, 115.072012), "Asia"),//hacer ruta no te olvides
+                    new Port("Semayang", new Coordinates(-1.273471, 116.805472), "Asia"),//hacer ruta no te olvides
 
                     // ========== AMÉRICA ==========
                     new Port("Arkits", new Coordinates(73.0, -128.0), "América"),
@@ -101,6 +104,13 @@ public class DataInitializer {
                     new Port("San Antonio", new Coordinates(-33.5983, -71.6123), "América"),
                     new Port("Montreal", new Coordinates(45.5017, -73.5673), "América"),
                     new Port("Rio Grande", new Coordinates(-32.0351, -52.0986), "América"),
+                    new Port("Puerto Montt", new Coordinates(-41.4718, -72.9396), "América"),
+                    new Port("Chancay", new Coordinates(-11.5903, -77.2761), "América"),
+                    new Port("Necochea y Quequén", new Coordinates(-38.5780, -58.700), "América"),
+                    new Port("Ushuaia", new Coordinates(-54.810668,-68.296487), "América"),
+                    new Port("Stanley", new Coordinates(-51.692358, -57.860840), "América"),
+                    new Port("Santo Domingo", new Coordinates(18.453811, -69.948417), "América"),
+                    new Port("La Habana", new Coordinates(23.149916, -82.372406), "América"),
 
                     // ========== ÁFRICA ==========
                     new Port("Ciudad del Cabo", new Coordinates(-33.9249, 18.4241), "África"),
@@ -142,25 +152,25 @@ public class DataInitializer {
                     new Port("Fremantle", new Coordinates(-32.0564, 115.7417), "Oceanía"),
                     new Port("Darwin", new Coordinates(-12.4634, 130.8456), "Oceanía"),
                     new Port("Port Moresby", new Coordinates(-9.4438, 147.1803), "Oceanía"),
-                    // ... (después de los puertos existentes de América)
-                    new Port("Ciudad de México", new Coordinates(19.4326, -99.1332), "América"), // Asumiendo puerto cercano
-                    new Port("Colón", new Coordinates(9.3582, -79.9015), "América"),
-                    new Port("San Salvador", new Coordinates(13.7942, -88.8965), "América"), // Asumiendo puerto cercano
 
+                    // ... (después de los puertos existentes de América)
+                    new Port("Ciudad de México", new Coordinates(19.4326, -99.1332), "América"),
+                    new Port("Colón", new Coordinates(9.3582, -79.9015), "América"),
+                    new Port("San Salvador", new Coordinates(13.7942, -88.8965), "América"),
                     // ... (después de los puertos existentes de África)
                     new Port("Puerto de Trípoli", new Coordinates(32.8872, 13.1913), "África"),
-                    new Port("Puerto de Túnez", new Coordinates(36.8065, 10.1815), "África"), // Asumiendo puerto cercano
+                    new Port("Puerto de Túnez", new Coordinates(36.8065, 10.1815), "África"),
 
                     // ... (después de los puertos existentes de Asia)
-                    new Port("Pyongyang", new Coordinates(39.0392, 125.7625), "Asia"), // Asumiendo puerto cercano
-                    new Port("Taiwán", new Coordinates(23.6978, 120.9605), "Asia"), // Coordenadas generales de la isla
+                    new Port("Pyongyang", new Coordinates(39.0392, 125.7625), "Asia"),
+                    new Port("Taiwán", new Coordinates(25.143604, 121.756390), "Asia"),
                     new Port("Puerto de Beirut", new Coordinates(33.8938, 35.5018), "Asia"),
                     new Port("Latakia", new Coordinates(35.5236, 35.7877), "Asia"),
                     new Port("Puerto de Haifa", new Coordinates(32.8184, 34.9895), "Asia"),
                     new Port("Puerto Said", new Coordinates(31.2653, 32.3019), "Asia"),
 
                     // ... (después de los puertos existentes de Europa)
-                    new Port("Puerto de Crimea", new Coordinates(45.3481, 34.4993), "Europa") // Coordenadas generales
+                    new Port("Puerto de Crimea", new Coordinates(45.3481, 34.4993), "Europa")
             );
 
             // Se insertan solo los que no existen para optimizar, aunque ya limpiamos antes.
@@ -186,7 +196,6 @@ public class DataInitializer {
         try {
             List<RouteDocument> routes = List.of(
                     // ========== Rutas Asiáticas ==========
-                    new RouteDocument("Tokyo", "Asia", "Busan", "Asia", 1000.0),
                     new RouteDocument("Shanghai", "Asia", "Busan", "Asia", 850.0),
                     new RouteDocument("Shanghai", "Asia", "Quanzhou", "Asia", 700.0),
                     new RouteDocument("Hong Kong", "Asia", "Quanzhou", "Asia", 800.0),
@@ -196,6 +205,13 @@ public class DataInitializer {
                     new RouteDocument("Mumbai", "Asia", "Muscat", "Asia", 1800.0),
                     new RouteDocument("Mumbai", "Asia", "Dubai", "Asia", 1900.0),
                     new RouteDocument("Aden", "Asia", "Muscat", "Asia", 1500.0),
+                    new RouteDocument("Semayang", "Asia", "Macasar", "Asia", 281.3),
+                    new RouteDocument("Muara Port", "Asia", "Singapore", "Asia", 709.1),
+                    new RouteDocument("Zhanjiang", "Asia", "Singapore", "Asia", 1262.2),
+                    new RouteDocument("Zhanjiang", "Asia", "Hong Kong", "Asia", 220.0),
+                    new RouteDocument("Zhanjiang", "Asia", "Taiwán", "Asia", 659.2),
+                    new RouteDocument("Taiwán", "Asia", "Tokyo", "Asia", 1138.1),
+                    new RouteDocument("Tokyo", "Asia", "Busan", "Asia", 528.1),
 
                     // ========== Rutas Oceánicas ==========
                     new RouteDocument("Jakarta", "Asia", "Darwin", "Oceanía", 2700.0),
@@ -204,10 +220,11 @@ public class DataInitializer {
                     new RouteDocument("Port Moresby", "Oceanía", "Brisbane", "Oceanía", 2500.0),
                     new RouteDocument("Brisbane", "Oceanía", "Sídney", "Oceanía", 900.0),
 
+
                     // ========== Rutas Transpacíficas ==========
                     new RouteDocument("San Francisco", "América", "Tokyo", "Asia", 8500.0),
                     new RouteDocument("Tokyo", "Asia", "Balboa", "América", 12500.0),
-                    new RouteDocument("Singapore", "Asia", "Valparaíso", "América", 17500.0),
+                    new RouteDocument("Singapore", "Asia", "Buenos Aires", "América", 8581.4),
 
                     // ========== Rutas Americanas ==========
                     new RouteDocument("San Francisco", "América", "Balboa", "América", 3200.0),
@@ -217,18 +234,48 @@ public class DataInitializer {
                     new RouteDocument("Guayaquil", "América", "Callao", "América", 1150.0),
                     new RouteDocument("Puerto Cabello", "América", "Cartagena", "América", 200.0),
                     new RouteDocument("San Antonio", "América", "Valparaíso", "América", 1100.0),
-                    new RouteDocument("Rio Grande", "América", "Buenos Aires", "América", 800.0),
-                    new RouteDocument("Rio de Janeiro", "América", "Buenos Aires", "América", 2000.0),
+                    new RouteDocument("Santo Domingo","América","Cartagena","América",581.9),
+                    new RouteDocument("Santo Domingo","América","Puerto Cabello","América", 494.0),
+                    new RouteDocument("La Habana","América","Santo Domingo","América", 753.7),
+                    new RouteDocument("La Habana","América","Fort Lauderdale","América", 216.5),
+                    new RouteDocument("La Habana","América","Houston","América", 803.4),
+
                     new RouteDocument("Cartagena", "América", "Balboa", "América", 800.0),
                     new RouteDocument("Callao", "América", "Valparaíso", "América", 1500.0),
-                    new RouteDocument("Valparaíso", "América", "Buenos Aires", "América", 2200.0),
+                    new RouteDocument("Cayena","América","Rio de Janeiro","América",4462.0),
+                    new RouteDocument("Cayena","América","Puerto Cabello","América",3131.0),
+
 
                     new RouteDocument("Balboa", "América", "Manzanillo", "América", 2700.0),
                     new RouteDocument("Manzanillo", "América", "Long Beach", "América", 2800.0),
                     new RouteDocument("New York", "América", "Fort Lauderdale", "América", 1600.0),
                     new RouteDocument("Vancouver", "América", "San Francisco", "América", 1900.0),
-                    new RouteDocument("Buenos Aires", "América", "Rio de Janeiro", "América", 2000.0),
-                    new RouteDocument("Rio de Janeiro", "América", "Rio Grande", "América", 800.0),
+                   //nuevo
+                    new RouteDocument("Long Beach", "América", "San Francisco", "América", 400.0),
+                    new RouteDocument("San Francisco", "América", "Vancouver", "América", 1300.0),
+                    new RouteDocument("Vancouver", "América", "Prince Rupert", "América", 800.0),
+                    new RouteDocument("Prince Rupert", "América", "Uelen", "Asia", 1342.3),
+                    new RouteDocument("Long Beach", "América", "Manzanillo", "América", 2000.0),
+                    new RouteDocument("Manzanillo", "América", "Balboa", "América", 2700.0),
+                    new RouteDocument("Balboa", "América", "Guayaquil", "América", 800.0),
+                    new RouteDocument("Chancay", "América", "Callao", "América",  29.7),
+                    new RouteDocument("Chancay", "América", "Guayaquil", "América",  585.6),
+
+                    // Vía estrecho de Magallanes
+
+                    new RouteDocument("San Antonio", "América", "Puerto Montt", "América", 476.0),
+                    new RouteDocument("Buenos Aires", "América", "Rio Grande", "América", 800.0),
+                    new RouteDocument("Buenos Aires", "América", "Necochea y Quequén", "América", 239.5),
+                    new RouteDocument("Necochea y Quequén", "América", "Stanley", "América",  788.9),
+                    new RouteDocument("Stanley", "América", "Ushuaia", "América",  419.3),
+                    new RouteDocument("Ushuaia", "América", "Puerto Montt", "América",  824.2),
+                    new RouteDocument("Rio Grande", "América", "Rio de Janeiro", "América", 1200.0),
+                    new RouteDocument("New York", "América", "Montreal", "América", 600.0),
+                    new RouteDocument("New York", "América", "Houston", "América", 2300.0),
+                    new RouteDocument("Houston", "América", "Colón", "América", 2500.0),
+                    new RouteDocument("Colón", "América", "Cartagena", "América", 500.0),
+                    new RouteDocument("Cartagena", "América", "Puerto Cabello", "América", 600.0),
+                    new RouteDocument("Puerto Cabello", "América", "Cayena", "América", 1500.0),
 
                     // ========== Rutas Áfricanas ==========
                     new RouteDocument("Walvis Bay", "África", "Luanda", "África", 1800.0),
@@ -238,13 +285,9 @@ public class DataInitializer {
                     new RouteDocument("Lagos", "África", "Luanda", "África", 2400.0),
 
                     new RouteDocument("Houston", "América", "New York", "América", 2500.0),
-                    new RouteDocument("Prince Rupert", "América", "Vancouver", "América", 800.0),
 
-                    // ========== Rutas Transatlánticas ==========
-                    new RouteDocument("Rotterdam", "Europa", "New York", "América", 5800.0),
-                    new RouteDocument("Lisboa", "Europa", "Rio de Janeiro", "América", 7200.0),
 
-                    // --- AÑADE ESTA RUTA PUENTE ---
+                    // --- RUTA PUENTE ---
                     new RouteDocument("Luanda", "África", "Ciudad del Cabo", "África", 2500.0), // Conecta el centro-oeste con el sur
                     new RouteDocument("Ciudad del Cabo", "África", "Durban", "África", 1300.0), // Conecta el sur con el este
                     new RouteDocument("Durban", "África", "Mombasa", "África", 3200.0),     // Conecta el sur-este con el este
@@ -269,8 +312,6 @@ public class DataInitializer {
                     new RouteDocument("Ciudad del Cabo", "África", "Walvis Bay", "África", 1300.0), // Nombre corregido
                     new RouteDocument("Dakar", "África", "Casablanca", "África", 2600.0),
                     new RouteDocument("Lagos", "África", "Luanda", "África", 2400.0),
-                    // --- CONEXIÓN QUE FALTA ---
-                    new RouteDocument("Arkits", "América", "Vancouver", "América", 1500.0),
 
                     // --- CONEXIONES QUE FALTAN EN ÁFRICA ---
                     new RouteDocument("Dakar", "África", "Casablanca", "África", 2600.0),
@@ -287,15 +328,15 @@ public class DataInitializer {
 
                     // Rutas Árticas (Uelen/Arkits)
                     new RouteDocument("Uelen", "Asia", "Arkits", "América", 2500.0),
+                    new RouteDocument("Uelen", "Asia", "Tokyo", "Asia", 2527.1),
+                    new RouteDocument("Uelen", "Asia", "Vancouver", "América", 1745.3),
                     new RouteDocument("Murmansk", "Europa", "Arkits", "América", 2200.0),
-                    new RouteDocument("Arkits", "América", "Vancouver", "América", 1500.0), // Conexión crucial que falta
                     // --- CONEXIONES PARA LOS PUERTOS AISLADOS ---
                     new RouteDocument("Nuakchot", "África", "Dakar", "África", 500.0),
                     new RouteDocument("Abiyán", "África", "Lagos", "África", 1000.0),
-                    new RouteDocument("Arkits", "América", "Vancouver", "América", 1500.0),
 
                     // --- PUENTES DENTRO DE ÁFRICA ---
-                    new RouteDocument("Casablanca", "África", "Lisboa", "Europa", 900.0), // Ya lo tienes, pero es bueno tenerlo cerca
+                    new RouteDocument("Casablanca", "África", "Lisboa", "Europa", 900.0),
                     new RouteDocument("Dakar", "África", "Cayena", "América", 4000.0), // Un puente transatlántico alternativo
                     new RouteDocument("Lagos", "África", "Port-Gentil", "África", 800.0),
                     new RouteDocument("Port-Gentil", "África", "Luanda", "África", 900.0),
@@ -305,7 +346,7 @@ public class DataInitializer {
                     new RouteDocument("Durban", "África", "Mombasa", "África", 3200.0),
                     new RouteDocument("Mombasa", "África", "Mogadishu", "África", 1000.0),
                     // ========== Rutas Troncales Transoceánicas (Puentes Globales) ==========
-            new RouteDocument("San Francisco", "América", "Tokyo", "Asia", 8500.0),
+                    new RouteDocument("San Francisco", "América", "Tokyo", "Asia", 8500.0),
                     new RouteDocument("Rotterdam", "Europa", "New York", "América", 5800.0),
                     new RouteDocument("Lisboa", "Europa", "Rio de Janeiro", "América", 7200.0),
                     new RouteDocument("Dakar", "África", "Cayena", "América", 4000.0),
@@ -321,31 +362,11 @@ public class DataInitializer {
                     new RouteDocument("Puerto de Crimea", "Europa", "Estambul", "Europa", 600.0),
                     new RouteDocument("Odessa", "Europa", "Constanza", "Europa", 350.0),
                     new RouteDocument("Puerto de Túnez", "África", "Valencia", "Europa", 900.0),
+                    new RouteDocument("Puerto de Túnez", "África", "Atenas", "Europa", 644.9),
                     new RouteDocument("Puerto de Trípoli", "África", "Genova", "Europa", 1000.0),
                     new RouteDocument("Taiwán", "Asia", "Shanghai", "Asia", 700.0),
                     new RouteDocument("Pyongyang", "Asia", "Tianjin", "Asia", 600.0),
 
-                    // ========== Rutas para conectar la red existente ==========
-                    // --- Conectando América ---
-                    new RouteDocument("Long Beach", "América", "San Francisco", "América", 400.0),
-                    new RouteDocument("San Francisco", "América", "Vancouver", "América", 1300.0),
-                    new RouteDocument("Vancouver", "América", "Prince Rupert", "América", 800.0),
-                    new RouteDocument("Prince Rupert", "América", "Arkits", "América", 1800.0),
-                    new RouteDocument("Long Beach", "América", "Manzanillo", "América", 2000.0),
-                    new RouteDocument("Manzanillo", "América", "Balboa", "América", 2700.0),
-                    new RouteDocument("Balboa", "América", "Guayaquil", "América", 800.0),
-                    new RouteDocument("Guayaquil", "América", "Callao", "América", 1150.0),
-                    new RouteDocument("Callao", "América", "Valparaíso", "América", 2500.0),
-                    new RouteDocument("Valparaíso", "América", "San Antonio", "América", 100.0),
-                    new RouteDocument("San Antonio", "América", "Buenos Aires", "América", 1200.0), // Vía estrecho de Magallanes (estimado)
-                    new RouteDocument("Buenos Aires", "América", "Rio Grande", "América", 800.0),
-                    new RouteDocument("Rio Grande", "América", "Rio de Janeiro", "América", 1200.0),
-                    new RouteDocument("New York", "América", "Montreal", "América", 600.0),
-                    new RouteDocument("New York", "América", "Houston", "América", 2300.0),
-                    new RouteDocument("Houston", "América", "Colón", "América", 2500.0),
-                    new RouteDocument("Colón", "América", "Cartagena", "América", 500.0),
-                    new RouteDocument("Cartagena", "América", "Puerto Cabello", "América", 600.0),
-                    new RouteDocument("Puerto Cabello", "América", "Cayena", "América", 1500.0),
 
                     // --- Conectando Europa ---
                     new RouteDocument("Hamburgo", "Europa", "Rotterdam", "Europa", 450.0),
@@ -353,8 +374,6 @@ public class DataInitializer {
                     new RouteDocument("Le Havre", "Europa", "Lisboa", "Europa", 1300.0),
                     new RouteDocument("Lisboa", "Europa", "Valencia", "Europa", 900.0),
                     new RouteDocument("Valencia", "Europa", "Genova", "Europa", 900.0),
-                    new RouteDocument("Genova", "Europa", "Atenas", "Europa", 1500.0),
-                    new RouteDocument("Atenas", "Europa", "Estambul", "Europa", 700.0),
                     new RouteDocument("Hamburgo", "Europa", "Copenhague", "Europa", 500.0),
                     new RouteDocument("Copenhague", "Europa", "San Petersburgo", "Europa", 1200.0),
                     new RouteDocument("San Petersburgo", "Europa", "Murmansk", "Europa", 1400.0),
@@ -367,9 +386,8 @@ public class DataInitializer {
                     new RouteDocument("Lagos", "África", "Luanda", "África", 2400.0),
                     new RouteDocument("Luanda", "África", "Walvis Bay", "África", 1300.0),
                     new RouteDocument("Walvis Bay", "África", "Ciudad del Cabo", "África", 1300.0),
-                    new RouteDocument("Atenas", "Europa", "Alexandría", "África", 1100.0),
                     new RouteDocument("Aden", "Asia", "Mogadishu", "África", 1200.0),
-            new RouteDocument("Atenas", "Europa", "Estambul", "Europa", 700.0),
+                    new RouteDocument("Atenas", "Europa", "Estambul", "Europa", 700.0),
 
 // --- ¡¡¡AÑADE ESTA LÍNEA PUENTE!!! ---
                     new RouteDocument("Estambul", "Europa", "Constanza", "Europa", 400.0), // Conecta el Mediterráneo con el Mar Negro
