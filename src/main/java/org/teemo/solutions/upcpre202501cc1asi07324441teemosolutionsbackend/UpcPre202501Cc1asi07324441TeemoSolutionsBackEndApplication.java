@@ -18,12 +18,13 @@ import java.time.Clock;
 @EnableConfigurationProperties(JwtProperties.class)
 public class UpcPre202501Cc1asi07324441TeemoSolutionsBackEndApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(UpcPre202501Cc1asi07324441TeemoSolutionsBackEndApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(UpcPre202501Cc1asi07324441TeemoSolutionsBackEndApplication.class, args);
+    }
 
-	@Bean
-	public Clock clock() {
-		return Clock.systemUTC();
-	}
+    @Bean
+    public Clock clock() {
+        return Clock.systemUTC();
+    }
 }
+

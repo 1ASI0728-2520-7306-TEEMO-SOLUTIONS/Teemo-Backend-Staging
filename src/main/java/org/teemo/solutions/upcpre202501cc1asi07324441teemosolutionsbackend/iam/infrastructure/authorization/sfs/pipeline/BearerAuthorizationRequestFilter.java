@@ -84,5 +84,6 @@ public class BearerAuthorizationRequestFilter extends OncePerRequestFilter {
                 || new AntPathRequestMatcher("/swagger-ui/**").matches(request)
                 || new AntPathRequestMatcher("/swagger-resources/**").matches(request)
                 || new AntPathRequestMatcher("/webjars/**").matches(request);
+
     }
 }

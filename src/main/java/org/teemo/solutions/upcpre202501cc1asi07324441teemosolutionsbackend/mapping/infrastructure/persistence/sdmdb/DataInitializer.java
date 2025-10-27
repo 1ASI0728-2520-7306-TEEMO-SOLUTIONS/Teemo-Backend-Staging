@@ -83,6 +83,18 @@ public class DataInitializer {
                     new Port("Semayang", new Coordinates(-1.273471, 116.805472), "Asia"),//hacer ruta no te olvides
 
                     // ========== AMÉRICA ==========
+                    new Port("Santos", new Coordinates(-23.9500, -46.3333), "América"),
+                    new Port("Montevideo", new Coordinates(-34.9033, -56.2000), "América"),
+                    new Port("Veracruz", new Coordinates(19.1800, -96.1333), "América"),
+                    new Port("Lázaro Cárdenas", new Coordinates(17.9583, -102.2000), "América"),
+                    new Port("Seattle", new Coordinates(47.6062, -122.3321), "América"),
+                    new Port("Tacoma", new Coordinates(47.2529, -122.4443), "América"),
+                    new Port("Savannah", new Coordinates(32.0835, -81.0998), "América"),
+                    new Port("Norfolk", new Coordinates(36.8508, -76.2859), "América"),
+                    new Port("Kingston", new Coordinates(17.9714, -76.7920), "América"),
+                    new Port("Freeport", new Coordinates(26.5333, -78.7000), "América"),
+                    new Port("Caucedo", new Coordinates(18.4210, -69.6120), "América"),
+                    //nuevos arriba
                     new Port("Arkits", new Coordinates(73.0, -128.0), "América"),
                     new Port("Callao", new Coordinates(-12.0564, -77.1319), "América"),
                     new Port("Buenos Aires", new Coordinates(-34.6037, -58.3816), "América"),
@@ -128,6 +140,13 @@ public class DataInitializer {
                     new Port("Casablanca", new Coordinates(33.5731, -7.5898), "África"),
                     new Port("Mogadishu", new Coordinates(2.0469, 45.3182), "África"),
 
+                    new Port("Tema", new Coordinates(5.6333, 0.0167), "África"),
+                    new Port("Lomé", new Coordinates(6.1375, 1.2228), "África"),
+                    new Port("Cotonou", new Coordinates(6.3654, 2.4183), "África"),
+                    new Port("Beira", new Coordinates(-19.8436, 34.8389), "África"),
+                    new Port("Maputo", new Coordinates(-25.9653, 32.5892), "África"),
+                    new Port("Tanger Med", new Coordinates(35.8844, -5.5036), "África"),
+
                     // ========== EUROPA ==========
                     new Port("Odessa", new Coordinates(46.4825, 30.7233), "Europa"),
                     new Port("Murmansk", new Coordinates(68.9585, 33.0827), "Europa"),
@@ -152,11 +171,12 @@ public class DataInitializer {
                     new Port("Fremantle", new Coordinates(-32.0564, 115.7417), "Oceanía"),
                     new Port("Darwin", new Coordinates(-12.4634, 130.8456), "Oceanía"),
                     new Port("Port Moresby", new Coordinates(-9.4438, 147.1803), "Oceanía"),
+                    new Port("Melbourne", new Coordinates(-37.8136, 144.9631), "Oceanía"),
+                    new Port("Auckland", new Coordinates(-36.8509, 174.7645), "Oceanía"),
 
                     // ... (después de los puertos existentes de América)
-                    new Port("Ciudad de México", new Coordinates(19.4326, -99.1332), "América"),
                     new Port("Colón", new Coordinates(9.3582, -79.9015), "América"),
-                    new Port("San Salvador", new Coordinates(13.7942, -88.8965), "América"),
+                    new Port("Acajutla", new Coordinates(13.574724, -89.834303), "América"),
                     // ... (después de los puertos existentes de África)
                     new Port("Puerto de Trípoli", new Coordinates(32.8872, 13.1913), "África"),
                     new Port("Puerto de Túnez", new Coordinates(36.8065, 10.1815), "África"),
@@ -168,8 +188,6 @@ public class DataInitializer {
                     new Port("Latakia", new Coordinates(35.5236, 35.7877), "Asia"),
                     new Port("Puerto de Haifa", new Coordinates(32.8184, 34.9895), "Asia"),
                     new Port("Puerto Said", new Coordinates(31.2653, 32.3019), "Asia"),
-
-                    // ... (después de los puertos existentes de Europa)
                     new Port("Puerto de Crimea", new Coordinates(45.3481, 34.4993), "Europa")
             );
 
@@ -349,6 +367,9 @@ public class DataInitializer {
                     new RouteDocument("San Francisco", "América", "Tokyo", "Asia", 8500.0),
                     new RouteDocument("Rotterdam", "Europa", "New York", "América", 5800.0),
                     new RouteDocument("Lisboa", "Europa", "Rio de Janeiro", "América", 7200.0),
+                    new RouteDocument("Singapore", "Asia", "Rio de Janeiro", "América", 7200.0),
+
+
                     new RouteDocument("Dakar", "África", "Cayena", "América", 4000.0),
                     new RouteDocument("Ciudad del Cabo", "África", "Buenos Aires", "América", 6900.0),
                     new RouteDocument("Sídney", "Oceanía", "Valparaíso", "América", 11000.0),
