@@ -14,12 +14,17 @@ public class PortMapper {
      */
     public Port toDomain(PortDocument document) {
         return new Port(
+                document.getId(),
                 document.getName(),
                 new Coordinates(
                         document.getCoordinates().getLatitude(),
                         document.getCoordinates().getLongitude()
                 ),
-                document.getContinent()
+                document.getContinent(),
+                document.isDisabled(),
+                document.getDisabledReason(),
+                document.getDisabledAt(),
+                document.getDisabledBy()
         );
     }
 

@@ -15,4 +15,5 @@ public interface PortRepository extends MongoRepository<PortDocument, String> {
     Optional<PortDocument> findByName(String name);
     boolean existsByNameAndContinent(String name, String continent);
     void deleteAll();
+    java.util.List<PortDocument> findByDisabled(boolean disabled);
 }

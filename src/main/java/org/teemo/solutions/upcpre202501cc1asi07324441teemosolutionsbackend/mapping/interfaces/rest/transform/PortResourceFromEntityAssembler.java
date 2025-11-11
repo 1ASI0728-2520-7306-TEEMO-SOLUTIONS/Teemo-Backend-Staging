@@ -13,7 +13,11 @@ public class PortResourceFromEntityAssembler {
                         port.getCoordinates().latitude(),
                         port.getCoordinates().longitude()
                 ),
-                port.getContinent()
+                port.getContinent(),
+                port.isDisabled(),
+                port.getDisabledReason(),
+                port.getDisabledAt(),
+                port.getDisabledBy()
         );
     }
 }

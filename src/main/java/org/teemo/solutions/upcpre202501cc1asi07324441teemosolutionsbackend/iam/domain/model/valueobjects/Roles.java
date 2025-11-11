@@ -3,5 +3,7 @@ package org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.iam.
 public enum Roles {
     ROLE_USER,
     ROLE_ADMIN,
-    ROLE_INSTRUCTOR
+    ROLE_INSTRUCTOR,
+    ROLE_OPERATOR,
+    ROLE_VIEWER
 }

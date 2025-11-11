@@ -4,14 +4,19 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.entities.Port;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.valueobjects.Coordinates;
 
+import java.time.Instant;
+
 @Document(collection = "ports")
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 // --- INICIO DEL CÓDIGO AÑADIDO/MODIFICADO ---
@@ -23,6 +28,11 @@ public class PortDocument {
     private String name;
     private CoordinatesDocument coordinates;
     private String continent;
+    @Indexed(name = "idx_port_disabled")
+    private boolean disabled;
+    private String disabledReason;
+    private Instant disabledAt;
+    private String disabledBy;
 
     @Data
     public static class CoordinatesDocument {
@@ -39,13 +49,19 @@ public class PortDocument {
         this.name = name;
         this.coordinates = coordinates;
         this.continent = continent;
+        this.disabled = false;
     }
 
     public Port toDomain() {
         return new Port(
-            this.name,
-            new Coordinates(this.coordinates.latitude, this.coordinates.longitude),
-            this.continent
+                this.id,
+                this.name,
+                new Coordinates(this.coordinates.latitude, this.coordinates.longitude),
+                this.continent,
+                this.disabled,
+                this.disabledReason,
+                this.disabledAt,
+                this.disabledBy
         );
     }
 }
