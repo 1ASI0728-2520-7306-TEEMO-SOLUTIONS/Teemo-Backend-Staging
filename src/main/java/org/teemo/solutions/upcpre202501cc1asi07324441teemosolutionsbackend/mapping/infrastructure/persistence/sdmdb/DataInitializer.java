@@ -159,6 +159,10 @@ public class DataInitializer {
                     new Port("Rotterdam", new Coordinates(51.9244, 4.4777), "Europa"),
                     new Port("Le Havre", new Coordinates(49.4944, 0.1089), "Europa"),
                     new Port("Genova", new Coordinates(44.4056, 8.9463), "Europa"),
+                    new Port("Venecia", new Coordinates(45.442374, 12.301968), "Europa"),
+                    new Port("Bari", new Coordinates(41.126746, 16.888232), "Europa"),
+                    new Port("Napoli", new Coordinates(40.833109, 14.268100), "Europa"),
+                    new Port("Palermo", new Coordinates(38.128761, 13.367153), "Europa"),
                     new Port("Atenas", new Coordinates(37.9838, 23.7275), "Europa"),
                     new Port("San Petersburgo", new Coordinates(59.9343, 30.3351), "Europa"),
                     new Port("Copenhague", new Coordinates(55.6761, 12.5683), "Europa"),
@@ -178,8 +182,8 @@ public class DataInitializer {
                     new Port("Colón", new Coordinates(9.3582, -79.9015), "América"),
                     new Port("Acajutla", new Coordinates(13.574724, -89.834303), "América"),
                     // ... (después de los puertos existentes de África)
-                    new Port("Puerto de Trípoli", new Coordinates(32.8872, 13.1913), "África"),
-                    new Port("Puerto de Túnez", new Coordinates(36.8065, 10.1815), "África"),
+                    new Port("Trípoli", new Coordinates(32.8872, 13.1913), "África"),
+                    new Port("Túnez", new Coordinates(36.8065, 10.1815), "África"),
 
                     // ... (después de los puertos existentes de Asia)
                     new Port("Pyongyang", new Coordinates(39.0392, 125.7625), "Asia"),
@@ -300,23 +304,27 @@ public class DataInitializer {
                     new RouteDocument("Ciudad del Cabo", "África", "Walvis Bay", "África", 1300.0),
                     new RouteDocument("Dakar", "África", "Casablanca", "África", 2600.0),
                     new RouteDocument("Lagos", "África", "Luanda", "África", 2400.0),
-
+                    new RouteDocument("Tanger Med", "África", "Lisboa", "Europa", 237.8),
+                    new RouteDocument("Tanger Med", "África", "Valencia", "Europa",  341.3),
                     new RouteDocument("Houston", "América", "New York", "América", 2500.0),
 
 
                     // --- RUTA PUENTE ---
                     new RouteDocument("Luanda", "África", "Ciudad del Cabo", "África", 2500.0), // Conecta el centro-oeste con el sur
                     new RouteDocument("Ciudad del Cabo", "África", "Durban", "África", 1300.0), // Conecta el sur con el este
-                    new RouteDocument("Durban", "África", "Mombasa", "África", 3200.0),     // Conecta el sur-este con el este
-                    new RouteDocument("Mombasa", "África", "Mogadishu", "África", 1000.0),   // Conecta con el destino final
+                    new RouteDocument("Durban", "África", "Mombasa", "África", 3200.0),
+                    new RouteDocument("Mombasa", "África", "Mogadishu", "África", 1000.0),
 
                     // ========== Rutas Europeas ==========
                     new RouteDocument("Stavanger", "Europa", "Murmansk", "Europa", 2800.0),
+                    new RouteDocument("Stavanger", "Europa", "Rotterdam", "Europa", 426.0),
                     new RouteDocument("Eupatoria", "Europa", "Estambul", "Europa", 800.0),
                     new RouteDocument("Lisboa", "Europa", "Casablanca", "África", 900.0),
                     new RouteDocument("Genova", "Europa", "Atenas", "Europa", 1800.0),
+                    new RouteDocument("Genova", "Europa", "Napoli", "Europa", 318.6),
+                    new RouteDocument("Palermo", "Europa", "Napoli", "Europa", 169.3),
+                    new RouteDocument("Venecia", "Europa", "Bari", "Europa", 327.0),
                     new RouteDocument("Hamburgo", "Europa", "Rotterdam", "Europa", 600.0),
-                    new RouteDocument("Le Havre", "Europa", "Valencia", "Europa", 1500.0),
                     new RouteDocument("San Petersburgo", "Europa", "Murmansk", "Europa", 1700.0),
 
                     // ========== Rutas África-Asia ==========
@@ -379,9 +387,12 @@ public class DataInitializer {
                     new RouteDocument("Puerto de Beirut", "Asia", "Puerto de Haifa", "Asia", 150.0),
                     new RouteDocument("Puerto de Crimea", "Europa", "Estambul", "Europa", 600.0),
                     new RouteDocument("Odessa", "Europa", "Constanza", "Europa", 350.0),
-                    new RouteDocument("Puerto de Túnez", "África", "Valencia", "Europa", 900.0),
-                    new RouteDocument("Puerto de Túnez", "África", "Atenas", "Europa", 644.9),
-                    new RouteDocument("Puerto de Trípoli", "África", "Genova", "Europa", 1000.0),
+                    new RouteDocument("Túnez", "África", "Valencia", "Europa", 900.0),
+                    new RouteDocument("Túnez", "África", "Atenas", "Europa", 644.9),
+                    new RouteDocument("Túnez", "África", "Palermo", "Europa", 169.3),
+                    new RouteDocument("Trípoli", "África", "Genova", "Europa", 718.5),
+                    new RouteDocument("Trípoli", "África", "Bari", "Europa", 526.6),
+                    new RouteDocument("Trípoli", "África", "Túnez", "África", 277.5),
                     new RouteDocument("Taiwán", "Asia", "Shanghai", "Asia", 700.0),
                     new RouteDocument("Pyongyang", "Asia", "Tianjin", "Asia", 600.0),
 
@@ -390,7 +401,6 @@ public class DataInitializer {
                     new RouteDocument("Hamburgo", "Europa", "Rotterdam", "Europa", 450.0),
                     new RouteDocument("Rotterdam", "Europa", "Le Havre", "Europa", 500.0),
                     new RouteDocument("Le Havre", "Europa", "Lisboa", "Europa", 1300.0),
-                    new RouteDocument("Lisboa", "Europa", "Valencia", "Europa", 900.0),
                     new RouteDocument("Valencia", "Europa", "Genova", "Europa", 900.0),
                     new RouteDocument("Hamburgo", "Europa", "Copenhague", "Europa", 500.0),
                     new RouteDocument("Copenhague", "Europa", "San Petersburgo", "Europa", 1200.0),

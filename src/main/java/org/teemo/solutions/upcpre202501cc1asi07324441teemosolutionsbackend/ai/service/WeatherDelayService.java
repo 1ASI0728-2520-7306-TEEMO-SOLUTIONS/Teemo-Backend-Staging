@@ -21,6 +21,7 @@ public class WeatherDelayService {
     private final String outputName;
 
     private final WeatherFeatureBuilder featureBuilder;
+    private final WeatherHazardDetectionService hazardDetectionService; // NUEVO
 
     // ====== Parámetros de realismo (ajústalos si lo ves necesario) ======
     /** Fracción del tiempo planificado que como máximo aporta el score del modelo. */
@@ -30,10 +31,16 @@ public class WeatherDelayService {
     /** Tope absoluto de retraso en horas. */
     private static final double ABSOLUTE_CAP_HOURS = 72.0;  // 72 h (3 días)
 
-    public WeatherDelayService(OrtEnvironment env, OrtSession session, WeatherFeatureBuilder featureBuilder) throws OrtException {
+    public WeatherDelayService(
+            OrtEnvironment env,
+            OrtSession session,
+            WeatherFeatureBuilder featureBuilder,
+            WeatherHazardDetectionService hazardDetectionService // NUEVO
+    ) throws OrtException {
         this.env = env;
         this.session = session;
         this.featureBuilder = featureBuilder;
+        this.hazardDetectionService = hazardDetectionService;
 
         // Descubrir nombres reales de entradas/salidas y registrarlos
         this.inputName = session.getInputInfo().keySet().iterator().next();
@@ -116,17 +123,26 @@ public class WeatherDelayService {
 
             // ---------------- ETA planificado y ajustado ----------------
             String plannedEtaIso = null, adjustedEtaIso = null;
+            Instant depRef = Instant.now();
             if (req.getDepartureTimeIso() != null && !req.getDepartureTimeIso().isBlank()) {
                 try {
-                    Instant dep = Instant.parse(req.getDepartureTimeIso()); // ISO-8601 (Z/offset)
+                    depRef = Instant.parse(req.getDepartureTimeIso()); // ISO-8601 (Z/offset)
                     long plannedSec = Math.round(plannedHours * 3600.0);
                     long totalSec   = Math.round((plannedHours + delayHours) * 3600.0);
-                    plannedEtaIso   = dep.plusSeconds(plannedSec).toString();
-                    adjustedEtaIso  = dep.plusSeconds(totalSec).toString();
+                    plannedEtaIso   = depRef.plusSeconds(plannedSec).toString();
+                    adjustedEtaIso  = depRef.plusSeconds(totalSec).toString();
                 } catch (DateTimeParseException ex) {
                     log.warn("departureTimeIso no es ISO-8601 válido: '{}'", req.getDepartureTimeIso());
                 }
             }
+
+            // ---------------- HAZARDS (probabilidades por zona) ----------------
+            double oLat = req.getOriginLat() != null ? req.getOriginLat() : 0.0;
+            double oLon = req.getOriginLon() != null ? req.getOriginLon() : 0.0;
+            double dLat = req.getDestLat()   != null ? req.getDestLat()   : 0.0;
+            double dLon = req.getDestLon()   != null ? req.getDestLon()   : 0.0;
+
+            var eval = hazardDetectionService.evaluate(oLat, oLon, dLat, dLon, depRef);
 
             // ---------------- Logging de trazabilidad ----------------
             log.info("[IA] features => distanceKm={}, plannedHours={}, avgWindKnots={}, maxWaveM={}",
@@ -140,6 +156,10 @@ public class WeatherDelayService {
                     String.format("%.2f", rawDelay),
                     String.format("%.2f", realisticCap),
                     String.format("%.2f", delayHours));
+            log.info("[HAZ] viable={}, hazardIdx={}, hazards={}",
+                    eval.routeViable,
+                    String.format("%.2f", eval.overallHazardProbability),
+                    eval.hazards != null ? eval.hazards.size() : 0);
 
             // ---------------- Respuesta ----------------
             var resp = new WeatherDelayResponse();
@@ -153,10 +173,18 @@ public class WeatherDelayService {
             resp.setUsedAvgWindKnots((double) avgWindKn);
             resp.setUsedMaxWaveM((double) maxWaveM);
 
-            log.info("Predicción IA OK en {} ms, delay={} h, plannedEta={}, adjustedEta={}",
+            // NUEVOS CAMPOS (prob. por zonas)
+            resp.setRouteViable(eval.routeViable);
+            resp.setNonViableReason(eval.nonViableReason);
+            resp.setOverallHazardProbability(eval.overallHazardProbability);
+            resp.setHazards(eval.hazards);
+
+            log.info("Predicción IA OK en {} ms, delay={} h, plannedEta={}, adjustedEta={}, viable={}, hazardIdx={}",
                     System.currentTimeMillis() - t0,
                     String.format("%.2f", delayHours),
-                    plannedEtaIso, adjustedEtaIso);
+                    plannedEtaIso, adjustedEtaIso,
+                    eval.routeViable,
+                    String.format("%.2f", eval.overallHazardProbability));
 
             return resp;
 
@@ -171,6 +199,11 @@ public class WeatherDelayService {
             fallback.setUsedFallback(true);
             fallback.setUsedAvgWindKnots(null);
             fallback.setUsedMaxWaveM(null);
+            // Fallback de hazards
+            fallback.setRouteViable(true);
+            fallback.setNonViableReason(null);
+            fallback.setOverallHazardProbability(0.0);
+            fallback.setHazards(java.util.Collections.emptyList());
             return fallback;
         }
     }
