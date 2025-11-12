@@ -10,6 +10,7 @@ import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mappi
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.services.RouteCalculatorService;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -19,9 +20,9 @@ public class RouteCalculatorServiceImpl implements RouteCalculatorService {
     private final RouteGraphBuilder graphBuilder;
 
     @Override
-    public List<Port> calculateOptimalRoute(Port start, Port end) {
-        RouteGraph graph = graphBuilder.buildDynamicRouteGraph();
+    public List<Port> calculateOptimalRoute(Port start, Port end, Set<String> avoidPortIds) {
+        RouteGraph graph = graphBuilder.buildDynamicRouteGraph(avoidPortIds);
         graph.logAllNodes();
-        return pathfinder.findOptimalRoute(start, end, graph);
+        return pathfinder.findOptimalRoute(start, end, graph, avoidPortIds);
     }
 }

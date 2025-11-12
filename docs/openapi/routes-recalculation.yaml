@@ -1,0 +1,66 @@
+paths:
+  /api/routes/{routeId}/recalculate:
+    post:
+      summary: Recalculate a route avoiding disabled ports
+      description: |
+        Available to VIEWER, OPERATOR, and ADMIN roles. Attempts to rebuild the optimal route while excluding ports that are currently disabled.
+      tags:
+        - Route
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: routeId
+          required: true
+          schema:
+            type: string
+          description: Identifier of the stored route definition.
+      responses:
+        '200':
+          description: Route recalculated successfully (or no change was required).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RouteRecalculationResource'
+        '409':
+          description: No viable route exists when avoiding the disabled ports.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    example: no_viable_route_avoiding_disabled_ports
+                  avoidedPortIds:
+                    type: array
+                    items:
+                      type: string
+                  message:
+                    type: string
+                required:
+                  - code
+                  - avoidedPortIds
+                  - message
+components:
+  schemas:
+    RouteRecalculationResource:
+      type: object
+      properties:
+        routeId:
+          type: string
+        optimalRoute:
+          type: array
+          items:
+            type: string
+        recalculated:
+          type: boolean
+        avoidedPortIds:
+          type: array
+          items:
+            type: string
+      required:
+        - routeId
+        - optimalRoute
+        - recalculated
+        - avoidedPortIds

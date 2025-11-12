@@ -45,12 +45,13 @@ public class AStarPathfinder {
         this.clock = clock;
     }
 
-    public List<Port> findOptimalRoute(Port start, Port end, RouteGraph graph) {
+    public List<Port> findOptimalRoute(Port start, Port end, RouteGraph graph, Set<String> avoidPortIds) {
 
         logger.info("Iniciando búsqueda de ruta desde el puerto: Nombre='{}', Continente='{}', HashCode={}",
                 start.getName(), start.getContinent(), start.hashCode());
 
         validateInputs(start, end, graph);
+        validateAvoidedEndpoints(start, end, avoidPortIds);
 
         final Set<String> unsafePortNames = safetyValidator.getUnsafePortNames();
         logger.info("Búsqueda A* iniciada con {} puertos marcados como inseguros.", unsafePortNames.size());
@@ -67,7 +68,7 @@ public class AStarPathfinder {
                 return reconstructPath(cameFrom, current.port());
             }
             // Pasamos el conjunto de puertos inseguros para una verificación rápida.
-            processNeighbors(current, end, graph, openSet, gScore, cameFrom, unsafePortNames);
+            processNeighbors(current, end, graph, openSet, gScore, cameFrom, unsafePortNames, avoidPortIds);
         }
 
         logger.warn("No se pudo encontrar una ruta desde '{}' hasta '{}'", start.getName(), end.getName());
@@ -76,9 +77,13 @@ public class AStarPathfinder {
 
     private void processNeighbors(Node current, Port end, RouteGraph graph,
                                   PriorityQueue<Node> openSet, Map<Port, Double> gScore,
-                                  Map<Port, Port> cameFrom, Set<String> unsafePortNames) { // <-- Acepta el Set
+                                  Map<Port, Port> cameFrom, Set<String> unsafePortNames, Set<String> avoidPortIds) { // <-- Acepta el Set
         for (Route edge : graph.getAdjacentEdges(current.port())) {
             Port neighbor = edge.getDestinationPort();
+
+            if (isPortAvoided(neighbor, avoidPortIds)) {
+                continue;
+            }
 
             // Pasamos el set al método de cálculo de coste.
             double totalEdgeCost = calculateTotalEdgeCost(edge, unsafePortNames);
@@ -131,6 +136,13 @@ public class AStarPathfinder {
         }
     }
 
+    private void validateAvoidedEndpoints(Port start, Port end, Set<String> avoidPortIds) {
+        if (isPortAvoided(start, avoidPortIds) || isPortAvoided(end, avoidPortIds)) {
+            throw new RouteNotFoundException(start.getName(), end.getName());
+        }
+    }
+
+
     private void initializeSearch(Port start, Port end, PriorityQueue<Node> openSet, Map<Port, Double> gScore) {
         gScore.put(start, 0.0);
         double hScore = calculateHeuristic(start, end);
@@ -171,5 +183,9 @@ public class AStarPathfinder {
             current = cameFrom.get(current);
         }
         return path;
+    }
+
+    private boolean isPortAvoided(Port port, Set<String> avoidPortIds) {
+        return port.getId() != null && avoidPortIds.contains(port.getId());
     }
 }

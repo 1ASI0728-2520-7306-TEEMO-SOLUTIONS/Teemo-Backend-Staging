@@ -94,7 +94,6 @@ public class DataInitializer {
                     new Port("Kingston", new Coordinates(17.9714, -76.7920), "América"),
                     new Port("Freeport", new Coordinates(26.5333, -78.7000), "América"),
                     new Port("Caucedo", new Coordinates(18.4210, -69.6120), "América"),
-                    //nuevos arriba
                     new Port("Arkits", new Coordinates(73.0, -128.0), "América"),
                     new Port("Callao", new Coordinates(-12.0564, -77.1319), "América"),
                     new Port("Buenos Aires", new Coordinates(-34.6037, -58.3816), "América"),
@@ -139,8 +138,10 @@ public class DataInitializer {
                     new Port("Alexandría", new Coordinates(31.2001, 29.9187), "África"),
                     new Port("Casablanca", new Coordinates(33.5731, -7.5898), "África"),
                     new Port("Mogadishu", new Coordinates(2.0469, 45.3182), "África"),
-
+                    new Port("Freetown", new Coordinates(8.497950, -13.291969), "África"),
                     new Port("Tema", new Coordinates(5.6333, 0.0167), "África"),
+                    new Port("Monrovia", new Coordinates(6.345634, -10.797214), "África"),
+                    new Port("Conakri", new Coordinates(9.523226, -13.705952), "África"),
                     new Port("Lomé", new Coordinates(6.1375, 1.2228), "África"),
                     new Port("Cotonou", new Coordinates(6.3654, 2.4183), "África"),
                     new Port("Beira", new Coordinates(-19.8436, 34.8389), "África"),
@@ -177,6 +178,7 @@ public class DataInitializer {
                     new Port("Port Moresby", new Coordinates(-9.4438, 147.1803), "Oceanía"),
                     new Port("Melbourne", new Coordinates(-37.8136, 144.9631), "Oceanía"),
                     new Port("Auckland", new Coordinates(-36.8509, 174.7645), "Oceanía"),
+                    new Port("Hedland", new Coordinates(-20.297171, 118.595167), "Oceanía"),
 
                     // ... (después de los puertos existentes de América)
                     new Port("Colón", new Coordinates(9.3582, -79.9015), "América"),
@@ -244,6 +246,7 @@ public class DataInitializer {
                     new RouteDocument("Darwin", "Oceanía", "Port Moresby", "Oceanía", 1800.0),
                     new RouteDocument("Port Moresby", "Oceanía", "Brisbane", "Oceanía", 2500.0),
                     new RouteDocument("Brisbane", "Oceanía", "Sídney", "Oceanía", 900.0),
+                    new RouteDocument("Hedland", "Oceanía", "Darwin", "Oceanía", 847.4),
 
 
                     // ========== Rutas Transpacíficas ==========
@@ -307,8 +310,24 @@ public class DataInitializer {
                     new RouteDocument("Tanger Med", "África", "Lisboa", "Europa", 237.8),
                     new RouteDocument("Tanger Med", "África", "Valencia", "Europa",  341.3),
                     new RouteDocument("Houston", "América", "New York", "América", 2500.0),
-
-
+                    new RouteDocument("Walvis Bay", "África", "Luanda", "África", 1800.0),
+                    new RouteDocument("Cotonou", "África", "Lagos", "África", 58.1),
+                    new RouteDocument("Cotonou", "África", "Lomé", "África", 81.6),
+                    new RouteDocument("Tema", "África", "Abiyán", "África", 242.2),
+                    new RouteDocument("Mogadishu", "África", "Aden", "Asia", 1200.0),
+                    new RouteDocument("Ciudad del Cabo", "África", "Walvis Bay", "África", 1300.0),
+                    new RouteDocument("Dakar", "África", "Casablanca", "África", 2600.0),
+                    new RouteDocument("Lagos", "África", "Luanda", "África", 2400.0),
+                    new RouteDocument("Dakar", "África", "Casablanca", "África", 2600.0),
+                    new RouteDocument("Lagos", "África", "Luanda", "África", 2400.0),
+                    new RouteDocument("Abiyán", "África", "Lagos", "África", 1000.0),
+                    new RouteDocument("Luanda", "África", "Ciudad del Cabo", "África", 2500.0),
+                    new RouteDocument("Ciudad del Cabo", "África", "Durban", "África", 1300.0),
+                    new RouteDocument("Durban", "África", "Mombasa", "África", 3200.0),
+                    new RouteDocument("Mombasa", "África", "Mogadishu", "África", 1000.0),
+                    new RouteDocument("Monrovia", "África", "Freetown", "África", 194.2),
+                    new RouteDocument("Monrovia", "África", "Abiyán", "África", 410.1),
+                    new RouteDocument("Freetown", "África", "Conakri", "África", 66.6),
                     // --- RUTA PUENTE ---
                     new RouteDocument("Luanda", "África", "Ciudad del Cabo", "África", 2500.0), // Conecta el centro-oeste con el sur
                     new RouteDocument("Ciudad del Cabo", "África", "Durban", "África", 1300.0), // Conecta el sur con el este
@@ -330,22 +349,6 @@ public class DataInitializer {
                     // ========== Rutas África-Asia ==========
                     new RouteDocument("Mombasa", "África", "Mumbai", "Asia", 4300.0),
                     new RouteDocument("Durban", "África", "Chennai", "Asia", 6800.0),
-
-                    // ========== Rutas Áfricanas ==========
-                    new RouteDocument("Walvis Bay", "África", "Luanda", "África", 1800.0), // Corregido nombre
-                    new RouteDocument("Mogadishu", "África", "Aden", "Asia", 1200.0), // Nombre corregido
-                    new RouteDocument("Ciudad del Cabo", "África", "Walvis Bay", "África", 1300.0), // Nombre corregido
-                    new RouteDocument("Dakar", "África", "Casablanca", "África", 2600.0),
-                    new RouteDocument("Lagos", "África", "Luanda", "África", 2400.0),
-
-                    // --- CONEXIONES QUE FALTAN EN ÁFRICA ---
-                    new RouteDocument("Dakar", "África", "Casablanca", "África", 2600.0),
-                    new RouteDocument("Lagos", "África", "Luanda", "África", 2400.0),
-                    new RouteDocument("Abiyán", "África", "Lagos", "África", 1000.0),
-                    new RouteDocument("Luanda", "África", "Ciudad del Cabo", "África", 2500.0),
-                    new RouteDocument("Ciudad del Cabo", "África", "Durban", "África", 1300.0),
-                    new RouteDocument("Durban", "África", "Mombasa", "África", 3200.0),
-                    new RouteDocument("Mombasa", "África", "Mogadishu", "África", 1000.0),
 
                     // ========== Rutas Mediterráneas ==========
                     new RouteDocument("Atenas", "Europa", "Alexandría", "África", 1100.0),

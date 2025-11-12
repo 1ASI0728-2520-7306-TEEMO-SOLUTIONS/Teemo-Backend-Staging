@@ -6,11 +6,13 @@ import org.springframework.stereotype.Component;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.entities.Port;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.entities.Route;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.exceptions.PortNotFoundException;
-import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.valueobjects.Coordinates;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.valueobjects.RouteGraph;
+import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.infrastructure.mappers.PortMapper;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.infrastructure.persistence.sdmdb.documents.RouteDocument;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.infrastructure.persistence.sdmdb.repositories.PortRepository;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.infrastructure.persistence.sdmdb.repositories.RouteRepository;
+
+import java.util.Set;
 
 @Component
 public class RouteGraphBuilder {
@@ -18,64 +20,59 @@ public class RouteGraphBuilder {
 
     private final RouteRepository routeRepository;
     private final PortRepository portRepository;
-    private final NavigationConditionsService navConditions;
+    private final PortMapper portMapper;
 
-    public RouteGraphBuilder(RouteRepository _routeRepository,
-                             PortRepository _portRepository,
-                             NavigationConditionsService _navConditions) {
-        this.routeRepository = _routeRepository;
-        this.portRepository = _portRepository;
-        this.navConditions = _navConditions;
+    public RouteGraphBuilder(RouteRepository routeRepository,
+                             PortRepository portRepository,
+                             PortMapper portMapper) {
+        this.routeRepository = routeRepository;
+        this.portRepository = portRepository;
+        this.portMapper = portMapper;
     }
 
-    public RouteGraph buildDynamicRouteGraph() {
+    public RouteGraph buildDynamicRouteGraph(Set<String> avoidPortIds) {
         RouteGraph graph = new RouteGraph();
-        // Carga las rutas desde la base de datos
         routeRepository.findAll().forEach(route -> {
             try {
-                processRouteDocument(route, graph);
+                processRouteDocument(route, graph, avoidPortIds);
             } catch (PortNotFoundException e) {
-                logger.warn("Omisión de ruta: {}", e.getMessage());
+                logger.warn("Omission de ruta: {}", e.getMessage());
             }
         });
         return graph;
     }
 
-    private void processRouteDocument(RouteDocument route, RouteGraph graph) {
+    private void processRouteDocument(RouteDocument route, RouteGraph graph, Set<String> avoidPortIds) {
         try {
             Port origin = getValidPort(route.getHomePort(), route.getHomePortContinent());
             Port destination = getValidPort(route.getDestinationPort(), route.getDestinationPortContinent());
+            if (isPortAvoided(origin, avoidPortIds) || isPortAvoided(destination, avoidPortIds)) {
+                return;
+            }
             addDynamicEdgePair(graph, origin, destination, route.getDistance());
 
-            logger.info("Añadiendo al grafo: Puerto Origen='{}', Continente='{}', HashCode={}",
+            logger.info("Anadiendo al grafo: Puerto Origen='{}', Continente='{}', HashCode={}",
                     origin.getName(), origin.getContinent(), origin.hashCode());
-            logger.info("Añadiendo al grafo: Puerto Destino='{}', Continente='{}', HashCode={}",
+            logger.info("Anadiendo al grafo: Puerto Destino='{}', Continente='{}', HashCode={}",
                     destination.getName(), destination.getContinent(), destination.hashCode());
 
         } catch (PortNotFoundException e) {
-            logger.warn("Omisión de ruta: {}", e.getMessage());
+            logger.warn("Omission de ruta: {}", e.getMessage());
         }
     }
 
     private Port getValidPort(String name, String continent) {
         return portRepository.findByNameAndContinent(name, continent)
-                .map(portDocument -> new Port(
-                        portDocument.getName(),
-                        new Coordinates(
-                                portDocument.getCoordinates().getLatitude(),
-                                portDocument.getCoordinates().getLongitude()
-                        ),
-                        portDocument.getContinent()
-                ))
+                .map(portMapper::toDomain)
                 .orElseThrow(() -> new PortNotFoundException("Port not found: " + name + " in continent: " + continent));
     }
 
     private void addDynamicEdgePair(RouteGraph graph, Port a, Port b, double baseDistance) {
-        // Crea la ruta en UNA SOLA dirección.
         Route route = new Route(a, b, baseDistance);
-
-        // La clase RouteGraph se encarga de hacerla bidireccional.
-        // Solo se necesita esta llamada.
         graph.addEdge(route);
+    }
+
+    private boolean isPortAvoided(Port port, Set<String> avoidPortIds) {
+        return port.getId() != null && avoidPortIds.contains(port.getId());
     }
 }

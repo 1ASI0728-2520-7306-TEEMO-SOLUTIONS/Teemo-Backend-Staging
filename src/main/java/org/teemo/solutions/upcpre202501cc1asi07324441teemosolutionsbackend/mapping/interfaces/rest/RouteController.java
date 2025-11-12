@@ -4,15 +4,25 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.application.internal.services.RouteService;
+import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.exceptions.NoViableRouteAvoidingDisabledPortsException;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.exceptions.PortNotFoundException;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.exceptions.RouteNotFoundException;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.infrastructure.persistence.sdmdb.documents.RouteDocument;
-import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.interfaces.rest.resources.*;
+import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.interfaces.rest.resources.RouteCalculationResource;
+import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.interfaces.rest.resources.RouteDistanceResource;
+import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.interfaces.rest.resources.RouteRecalculationResource;
 
 import java.util.List;
 import java.util.Map;
@@ -22,23 +32,22 @@ import java.util.Map;
 @Tag(name = "Route", description = "Route Endpoints")
 public class RouteController {
 
-    Logger logger = org.slf4j.LoggerFactory.getLogger(RouteController.class);
+    private static final Logger logger = LoggerFactory.getLogger(RouteController.class);
     private final RouteService routeService;
 
     public RouteController(RouteService routeService) {
         this.routeService = routeService;
     }
 
-    // Endpoint para calcular la ruta óptima entre dos puertos
+    @Operation(summary = "Calcula la ruta optima entre dos puertos")
     @PostMapping("/calculate-optimal-route")
     public ResponseEntity<RouteCalculationResource> calculateOptimalRoute(
-            @Parameter(description = "Puerto de origen", required = true)
-            @RequestParam String startPort,
-
-            @Parameter(description = "Puerto de destino", required = true)
-            @RequestParam String endPort) {
+            @Parameter(description = "ID del puerto de origen", required = true)
+            @RequestParam("startPortId") String startPortId,
+            @Parameter(description = "ID del puerto de destino", required = true)
+            @RequestParam("endPortId") String endPortId) {
         try {
-            RouteCalculationResource optimalRoute = routeService.calculateOptimalRoute(startPort, endPort);
+            RouteCalculationResource optimalRoute = routeService.calculateOptimalRoute(startPortId, endPortId);
             return ResponseEntity.ok(optimalRoute);
         } catch (PortNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -57,7 +66,6 @@ public class RouteController {
                             Map.of()
                     ));
         } catch (Exception e) {
-            // Log detallado para el desarrollador
             logger.error("Error interno: ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new RouteCalculationResource(
@@ -69,37 +77,35 @@ public class RouteController {
         }
     }
 
-    // Endpoint para obtener la distancia entre dos puertos específicos
     @Operation(summary = "Obtiene distancia entre dos puertos")
     @GetMapping("/distance-between-ports")
     public ResponseEntity<RouteDistanceResource> getDistanceBetweenPorts(
-            @Parameter(description = "Puerto de origen", required = true)
-            @RequestParam String startPort,
-
-            @Parameter(description = "Puerto de destino", required = true)
-            @RequestParam String endPort) {
+            @Parameter(description = "ID del puerto de origen", required = true)
+            @RequestParam("startPortId") String startPortId,
+            @Parameter(description = "ID del puerto de destino", required = true)
+            @RequestParam("endPortId") String endPortId) {
         try {
-            // 1. Obtener la ruta óptima usando el servicio existente
-            RouteCalculationResource optimalRoute = routeService.calculateOptimalRoute(startPort, endPort);
+            RouteCalculationResource optimalRoute = routeService.calculateOptimalRoute(startPortId, endPortId);
 
-            // 2. Extraer la distancia total y mensajes relevantes
             double distance = optimalRoute.totalDistance();
             List<String> messages = optimalRoute.warnings();
 
-            // 3. Construir metadata con los puertos
             Map<String, Object> meta = Map.of(
-                    "startPort", startPort,
-                    "endPort", endPort,
+                    "startPortId", startPortId,
+                    "endPortId", endPortId,
                     "routeSteps", optimalRoute.optimalRoute().size()
             );
 
-            // 4. Retornar respuesta exitosa
-            return ResponseEntity.ok(
-                    new RouteDistanceResource(distance, messages, meta)
-            );
+            return ResponseEntity.ok(new RouteDistanceResource(distance, messages, meta));
 
+        } catch (PortNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new RouteDistanceResource(
+                            0.0,
+                            List.of("Error: " + e.getMessage()),
+                            Map.of()
+                    ));
         } catch (IllegalStateException e) {
-            // Manejar errores de negocio (ej: ruta no encontrada)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new RouteDistanceResource(
                             0.0,
@@ -107,7 +113,6 @@ public class RouteController {
                             Map.of()
                     ));
         } catch (Exception e) {
-            // Manejar errores inesperados
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new RouteDistanceResource(
                             0.0,
@@ -117,7 +122,23 @@ public class RouteController {
         }
     }
 
-    // Endpoint para obtener todas las rutas
+    @Operation(summary = "Recalcula ruta evitando puertos deshabilitados")
+    @PreAuthorize("hasAnyRole('ROLE_VIEWER','ROLE_OPERATOR','ROLE_ADMIN')")
+    @PostMapping("/{routeId}/recalculate")
+    public ResponseEntity<?> recalculateRoute(@PathVariable String routeId) {
+        try {
+            RouteRecalculationResource resource = routeService.recalculateRouteAvoidingDisabledPorts(routeId);
+            return ResponseEntity.ok(resource);
+        } catch (NoViableRouteAvoidingDisabledPortsException ex) {
+            Map<String, Object> payload = Map.of(
+                    "code", "no_viable_route_avoiding_disabled_ports",
+                    "avoidedPortIds", List.copyOf(ex.getAvoidedPortIds()),
+                    "message", ex.getMessage()
+            );
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(payload);
+        }
+    }
+
     @GetMapping("/all-routes")
     public ResponseEntity<List<RouteDocument>> getAllRoutes() {
         List<RouteDocument> routesPage = routeService.findAllRoutes();
