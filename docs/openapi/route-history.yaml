@@ -1,0 +1,234 @@
+paths:
+  /api/users/{userId}/route-history:
+    get:
+      summary: List route history for a user
+      tags:
+        - Route History
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: from
+          schema:
+            type: string
+            format: date-time
+        - in: query
+          name: to
+          schema:
+            type: string
+            format: date-time
+        - in: query
+          name: status
+          schema:
+            $ref: '#/components/schemas/RouteHistoryStatus'
+        - in: query
+          name: source
+          schema:
+            $ref: '#/components/schemas/RouteHistorySource'
+        - in: query
+          name: archived
+          schema:
+            type: boolean
+        - in: query
+          name: routeId
+          schema:
+            type: string
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 0
+          description: Zero-based page number.
+        - in: query
+          name: size
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+          description: Page size (default 20).
+      responses:
+        '200':
+          description: Route history page
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RouteHistoryListResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+  /api/route-history/{historyId}:
+    get:
+      summary: Retrieve a single route history item
+      tags:
+        - Route History
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: historyId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Route history item
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RouteHistoryItemResource'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+  /api/route-history/{historyId}/archive:
+    patch:
+      summary: Archive a route history item
+      tags:
+        - Route History
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: historyId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                notes:
+                  type: string
+      responses:
+        '200':
+          description: Archived item
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RouteHistoryItemResource'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+components:
+  schemas:
+    RouteHistoryItemResource:
+      type: object
+      properties:
+        id:
+          type: string
+        tenantId:
+          type: string
+          nullable: true
+        userId:
+          type: string
+        routeId:
+          type: string
+          nullable: true
+        originPortId:
+          type: string
+        destinationPortId:
+          type: string
+        waypointPortIds:
+          type: array
+          items:
+            type: string
+        avoidedPortIds:
+          type: array
+          items:
+            type: string
+        computedAt:
+          type: string
+          format: date-time
+        engineVersion:
+          type: string
+          nullable: true
+        totalDistance:
+          type: number
+          format: double
+          nullable: true
+        durationEstimate:
+          type: number
+          format: double
+          nullable: true
+        costEstimate:
+          type: number
+          format: double
+          nullable: true
+        status:
+          $ref: '#/components/schemas/RouteHistoryStatus'
+        source:
+          $ref: '#/components/schemas/RouteHistorySource'
+        notes:
+          type: string
+          nullable: true
+        archived:
+          type: boolean
+        metadata:
+          type: object
+          additionalProperties: true
+        pathEncoding:
+          type: string
+          nullable: true
+        geojson:
+          type: object
+          nullable: true
+      required:
+        - id
+        - userId
+        - originPortId
+        - destinationPortId
+        - waypointPortIds
+        - avoidedPortIds
+        - computedAt
+        - status
+        - source
+        - archived
+        - metadata
+    RouteHistoryListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/RouteHistoryItemResource'
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+        nextCursor:
+          type: string
+          nullable: true
+      required:
+        - items
+        - page
+        - size
+        - totalElements
+        - totalPages
+    RouteHistoryStatus:
+      type: string
+      enum:
+        - SUCCESS
+        - NO_VIABLE_ROUTE
+        - CANCELLED
+    RouteHistorySource:
+      type: string
+      enum:
+        - AUTO
+        - MANUAL
+        - OPERATOR_OVERRIDE
+  responses:
+    ForbiddenError:
+      description: The caller is not authorized to access the requested resource.
+    NotFoundError:
+      description: Route history entry not found.

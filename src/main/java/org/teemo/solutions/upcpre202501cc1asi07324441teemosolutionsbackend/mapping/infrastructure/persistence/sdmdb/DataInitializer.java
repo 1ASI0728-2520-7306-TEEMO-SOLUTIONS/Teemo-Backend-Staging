@@ -272,7 +272,10 @@ public class DataInitializer {
                     new RouteDocument("Cayena","América","Rio de Janeiro","América",4462.0),
                     new RouteDocument("Cayena","América","Puerto Cabello","América",3131.0),
                     new RouteDocument("Balboa", "América", "Manzanillo", "América", 2700.0),
-                    new RouteDocument("Manzanillo", "América", "Long Beach", "América", 2800.0),
+
+                    new RouteDocument("Manzanillo", "América", "Long Beach", "América", 1152.6),
+                    new RouteDocument("Lázaro Cárdenas", "América", "Acajutla", "América",  763.2),
+                    new RouteDocument("Manzanillo", "América", "Lázaro Cárdenas", "América", 2800.0),
                     new RouteDocument("New York", "América", "Fort Lauderdale", "América", 1600.0),
                     new RouteDocument("Vancouver", "América", "San Francisco", "América", 1900.0),
                    //nuevo
@@ -280,8 +283,6 @@ public class DataInitializer {
                     new RouteDocument("San Francisco", "América", "Vancouver", "América", 1300.0),
                     new RouteDocument("Vancouver", "América", "Prince Rupert", "América", 800.0),
                     new RouteDocument("Prince Rupert", "América", "Uelen", "Asia", 1342.3),
-                    new RouteDocument("Long Beach", "América", "Manzanillo", "América", 2000.0),
-                    new RouteDocument("Manzanillo", "América", "Balboa", "América", 2700.0),
                     new RouteDocument("Balboa", "América", "Guayaquil", "América", 800.0),
                     new RouteDocument("Chancay", "América", "Callao", "América",  29.7),
                     new RouteDocument("Chancay", "América", "Guayaquil", "América",  585.6),
@@ -385,6 +386,7 @@ public class DataInitializer {
 
                     // ========== Rutas Locales (Conectando los nuevos puertos) ==========
                     new RouteDocument("Puerto Said", "Asia", "Alexandría", "África", 200.0),
+                    new RouteDocument("Puerto Said", "Asia", "Aden", "Asia", 200.0),
                     new RouteDocument("Puerto de Haifa", "Asia", "Atenas", "Europa", 1200.0),
                     new RouteDocument("Latakia", "Asia", "Mersin", "Europa", 200.0),
                     new RouteDocument("Puerto de Beirut", "Asia", "Puerto de Haifa", "Asia", 150.0),

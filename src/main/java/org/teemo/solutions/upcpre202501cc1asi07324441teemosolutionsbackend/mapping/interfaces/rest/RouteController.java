@@ -15,14 +15,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.application.internal.services.RouteHistoryContext;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.application.internal.services.RouteService;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.exceptions.NoViableRouteAvoidingDisabledPortsException;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.exceptions.PortNotFoundException;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.exceptions.RouteNotFoundException;
+import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.valueobjects.RouteHistorySource;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.infrastructure.persistence.sdmdb.documents.RouteDocument;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.interfaces.rest.resources.RouteCalculationResource;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.interfaces.rest.resources.RouteDistanceResource;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.interfaces.rest.resources.RouteRecalculationResource;
+import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.shared.application.security.RoutingActorContext;
+import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.shared.application.security.RoutingActorContextProvider;
 
 import java.util.List;
 import java.util.Map;
@@ -34,9 +38,11 @@ public class RouteController {
 
     private static final Logger logger = LoggerFactory.getLogger(RouteController.class);
     private final RouteService routeService;
+    private final RoutingActorContextProvider actorContextProvider;
 
-    public RouteController(RouteService routeService) {
+    public RouteController(RouteService routeService, RoutingActorContextProvider actorContextProvider) {
         this.routeService = routeService;
+        this.actorContextProvider = actorContextProvider;
     }
 
     @Operation(summary = "Calcula la ruta optima entre dos puertos")
@@ -47,7 +53,14 @@ public class RouteController {
             @Parameter(description = "ID del puerto de destino", required = true)
             @RequestParam("endPortId") String endPortId) {
         try {
-            RouteCalculationResource optimalRoute = routeService.calculateOptimalRoute(startPortId, endPortId);
+            RoutingActorContext actor = actorContextProvider.currentActor();
+            RouteHistoryContext historyContext = RouteHistoryContext.builder()
+                    .userId(actor.userId())
+                    .tenantId(actor.tenantId())
+                    .source(RouteHistorySource.MANUAL)
+                    .metadata(Map.of("endpoint", "/api/routes/calculate-optimal-route"))
+                    .build();
+            RouteCalculationResource optimalRoute = routeService.calculateOptimalRoute(startPortId, endPortId, historyContext);
             return ResponseEntity.ok(optimalRoute);
         } catch (PortNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -127,14 +140,22 @@ public class RouteController {
     @PostMapping("/{routeId}/recalculate")
     public ResponseEntity<?> recalculateRoute(@PathVariable String routeId) {
         try {
-            RouteRecalculationResource resource = routeService.recalculateRouteAvoidingDisabledPorts(routeId);
+            RoutingActorContext actor = actorContextProvider.currentActor();
+            RouteHistoryContext historyContext = RouteHistoryContext.builder()
+                    .userId(actor.userId())
+                    .tenantId(actor.tenantId())
+                    .source(RouteHistorySource.OPERATOR_OVERRIDE)
+                    .routeId(routeId)
+                    .metadata(Map.of("endpoint", "/api/routes/{routeId}/recalculate"))
+                    .build();
+            RouteRecalculationResource resource = routeService.recalculateRouteAvoidingDisabledPorts(routeId, historyContext);
             return ResponseEntity.ok(resource);
         } catch (NoViableRouteAvoidingDisabledPortsException ex) {
             Map<String, Object> payload = Map.of(
                     "code", "no_viable_route_avoiding_disabled_ports",
                     "avoidedPortIds", List.copyOf(ex.getAvoidedPortIds()),
-                    "message", ex.getMessage()
-            );
+                "message", ex.getMessage()
+        );
             return ResponseEntity.status(HttpStatus.CONFLICT).body(payload);
         }
     }
