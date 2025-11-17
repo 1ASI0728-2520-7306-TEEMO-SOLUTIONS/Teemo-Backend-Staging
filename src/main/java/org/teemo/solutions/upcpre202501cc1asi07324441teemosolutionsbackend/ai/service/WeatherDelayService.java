@@ -9,6 +9,7 @@ import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.ai.dt
 
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
+import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -21,6 +22,7 @@ public class WeatherDelayService {
     private final String outputName;
 
     private final WeatherFeatureBuilder featureBuilder;
+    private final WeatherModelPreprocessor preprocessor;
     private final WeatherHazardDetectionService hazardDetectionService; // NUEVO
 
     // ====== Parámetros de realismo (ajústalos si lo ves necesario) ======
@@ -35,11 +37,13 @@ public class WeatherDelayService {
             OrtEnvironment env,
             OrtSession session,
             WeatherFeatureBuilder featureBuilder,
+            WeatherModelPreprocessor preprocessor,
             WeatherHazardDetectionService hazardDetectionService // NUEVO
     ) throws OrtException {
         this.env = env;
         this.session = session;
         this.featureBuilder = featureBuilder;
+        this.preprocessor = preprocessor;
         this.hazardDetectionService = hazardDetectionService;
 
         // Descubrir nombres reales de entradas/salidas y registrarlos
@@ -89,10 +93,8 @@ public class WeatherDelayService {
             }
 
             // ---------------- INFERENCIA ONNX ----------------
-            // Orden de features alineado con el entrenamiento:
-            // distanceKm, avgWindKnots, maxWaveM, plannedHours
-            float[] input = new float[] { distanceKm, avgWindKn, maxWaveM, plannedHours };
-            long[] shape  = new long[] { 1, 4 };
+            float[] input = buildModelInput(f, distanceKm, avgWindKn, maxWaveM);
+            long[] shape  = new long[] { 1, input.length };
 
             double modelScore;
             try (OnnxTensor tensor = OnnxTensor.createTensor(
@@ -205,6 +207,47 @@ public class WeatherDelayService {
             fallback.setOverallHazardProbability(0.0);
             fallback.setHazards(java.util.Collections.emptyList());
             return fallback;
+        }
+    }
+
+    private float[] buildModelInput(WeatherFeatureBuilder.Features features,
+                                    float distanceKm,
+                                    float avgWindKn,
+                                    float maxWaveM) {
+        Map<String, Double> numeric = new HashMap<>();
+        numeric.put("gc_distance_km", (double) distanceKm);
+        numeric.put("avg_wind_knots", (double) avgWindKn);
+        numeric.put("max_wave_m", (double) maxWaveM);
+        putIfPresent(numeric, "rain_mm", features.rainMm());
+        putIfPresent(numeric, "visibility_km", features.visibilityKm());
+        putIfPresent(numeric, "origin_queue", features.originQueue());
+        putIfPresent(numeric, "dest_queue", features.destQueue());
+        putIfPresent(numeric, "port_congestion_idx", features.portCongestionIdx());
+        putIfPresent(numeric, "lat_o", features.originLat());
+        putIfPresent(numeric, "lon_o", features.originLon());
+        putIfPresent(numeric, "lat_d", features.destLat());
+        putIfPresent(numeric, "lon_d", features.destLon());
+        if (features.month() != null) {
+            numeric.put("month", features.month().doubleValue());
+        }
+
+        Map<String, String> categorical = new HashMap<>();
+        putIfPresent(categorical, "port_origin", features.portOrigin());
+        putIfPresent(categorical, "port_dest", features.portDest());
+        putIfPresent(categorical, "season", features.season());
+
+        return preprocessor.prepareInput(numeric, categorical);
+    }
+
+    private static void putIfPresent(Map<String, Double> target, String key, Double value) {
+        if (value != null) {
+            target.put(key, value);
+        }
+    }
+
+    private static void putIfPresent(Map<String, String> target, String key, String value) {
+        if (value != null && !value.isBlank()) {
+            target.put(key, value);
         }
     }
 
