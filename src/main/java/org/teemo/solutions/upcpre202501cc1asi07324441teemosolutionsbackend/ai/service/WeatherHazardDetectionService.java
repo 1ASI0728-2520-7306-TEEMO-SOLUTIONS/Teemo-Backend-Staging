@@ -2,6 +2,7 @@ package org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.ai.s
 
 import org.springframework.stereotype.Service;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.ai.dto.WeatherHazardProbability;
+import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.ai.external.noaa.NoaaAlertsClient;
 
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -18,6 +19,12 @@ import java.util.List;
  */
 @Service
 public class WeatherHazardDetectionService {
+
+    private final NoaaAlertsClient noaaAlertsClient;
+
+    public WeatherHazardDetectionService(NoaaAlertsClient noaaAlertsClient) {
+        this.noaaAlertsClient = noaaAlertsClient;
+    }
 
     public static class HazardEval {
         public boolean routeViable = true;
@@ -38,6 +45,21 @@ public class WeatherHazardDetectionService {
         boolean viable = true;
         String reason = null;
 
+        List<WeatherHazardProbability> realtimeCycloneHazards =
+                noaaAlertsClient.fetchActiveCycloneAlerts(originLat, originLon, destLat, destLon, departure);
+        if (!realtimeCycloneHazards.isEmpty()) {
+            out.addAll(realtimeCycloneHazards);
+            double realtimeMax = realtimeCycloneHazards.stream()
+                    .mapToDouble(WeatherHazardProbability::getProbability)
+                    .max()
+                    .orElse(0.0);
+            maxProb = Math.max(maxProb, realtimeMax);
+            if (realtimeMax >= 0.7) {
+                viable = false;
+                reason = "Alerta NOAA: ciclon activo en la ruta";
+            }
+        }
+
         // ---- ICE (ej. Ártico) ----
         double iceProb = iceProbabilityAlongRoute(originLat, destLat, month);
         if (iceProb > 0.0) {
@@ -56,23 +78,27 @@ public class WeatherHazardDetectionService {
             // Si hay hielo con prob. alta en temporada fría, marcamos no viable
             if (iceProb >= 0.6 && isColdSeason(month)) {
                 viable = false;
-                reason = "Hielo estacional probable en la ruta";
+                if (reason == null) {
+                    reason = "Hielo estacional probable en la ruta";
+                }
             }
         }
 
         // ---- HURRICANE (Atlántico/Caribe/Pacífico tropical) ----
-        double hurProb = hurricaneProbability(originLat, originLon, destLat, destLon, month);
-        if (hurProb > 0.0) {
-            WeatherHazardProbability h = new WeatherHazardProbability();
-            h.setType("HURRICANE");
-            h.setProbability(hurProb);
-            h.setZoneName("Franja tropical propensa a ciclones");
-            h.setLatCenter((originLat + destLat) / 2.0);
-            h.setLonCenter((originLon + destLon) / 2.0);
-            h.setRadiusKm(600.0);
-            h.setMonth(month);
-            out.add(h);
-            maxProb = Math.max(maxProb, hurProb);
+        if (realtimeCycloneHazards.isEmpty()) {
+            double hurProb = hurricaneProbability(originLat, originLon, destLat, destLon, month);
+            if (hurProb > 0.0) {
+                WeatherHazardProbability h = new WeatherHazardProbability();
+                h.setType("HURRICANE");
+                h.setProbability(hurProb);
+                h.setZoneName("Franja tropical propensa a ciclones");
+                h.setLatCenter((originLat + destLat) / 2.0);
+                h.setLonCenter((originLon + destLon) / 2.0);
+                h.setRadiusKm(600.0);
+                h.setMonth(month);
+                out.add(h);
+                maxProb = Math.max(maxProb, hurProb);
+            }
         }
 
         // ---- MAREAJE (swell) Pacífico Sur (simple) ----
