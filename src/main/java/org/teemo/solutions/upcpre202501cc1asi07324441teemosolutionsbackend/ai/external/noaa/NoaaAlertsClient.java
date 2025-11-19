@@ -30,9 +30,9 @@ public class NoaaAlertsClient {
     private final WebClient webClient;
     private final NoaaAlertsProperties properties;
 
-    public NoaaAlertsClient(WebClient.Builder builder, NoaaAlertsProperties properties) {
+    public NoaaAlertsClient(WebClient webClient, NoaaAlertsProperties properties) {
         this.properties = properties;
-        this.webClient = builder
+        this.webClient = webClient.mutate()
                 .baseUrl(properties.getBaseUrl())
                 .defaultHeader(HttpHeaders.USER_AGENT, properties.getUserAgent())
                 .build();
@@ -97,7 +97,10 @@ public class NoaaAlertsClient {
             builder.queryParam("event", event);
         }
 
-        return builder.build(true).toUri();
+        return builder
+                .encode() // ensure query params like "Hurricane Warning" are escaped (spaces -> %20)
+                .build()
+                .toUri();
     }
 
     private WeatherHazardProbability mapFeature(NoaaAlertResponse.Feature feature, int month, double fallbackLat, double fallbackLon) {
