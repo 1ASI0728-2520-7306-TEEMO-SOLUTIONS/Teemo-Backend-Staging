@@ -81,6 +81,7 @@ public class DataInitializer {
                     new Port("Macasar", new Coordinates(-5.112648, 119.409072), "Asia"),//hacer ruta no te olvides
                     new Port("Muara Port", new Coordinates(5.024628, 115.072012), "Asia"),//hacer ruta no te olvides
                     new Port("Semayang", new Coordinates(-1.273471, 116.805472), "Asia"),//hacer ruta no te olvides
+                    new Port("Jeddah", new Coordinates(21.491871, 39.121831), "Asia"),
 
                     // ========== AMÉRICA ==========
                     new Port("Santos", new Coordinates(-23.9500, -46.3333), "América"),
@@ -386,7 +387,8 @@ public class DataInitializer {
 
                     // ========== Rutas Locales (Conectando los nuevos puertos) ==========
                     new RouteDocument("Puerto Said", "Asia", "Alexandría", "África", 200.0),
-                    new RouteDocument("Puerto Said", "Asia", "Aden", "Asia", 200.0),
+                    new RouteDocument("Puerto Said", "Asia", "Jeddah", "Asia", 692.2),
+                    new RouteDocument("Jeddah", "Asia", "Aden", "Asia", 623.6),
                     new RouteDocument("Puerto de Haifa", "Asia", "Atenas", "Europa", 1200.0),
                     new RouteDocument("Latakia", "Asia", "Mersin", "Europa", 200.0),
                     new RouteDocument("Puerto de Beirut", "Asia", "Puerto de Haifa", "Asia", 150.0),
