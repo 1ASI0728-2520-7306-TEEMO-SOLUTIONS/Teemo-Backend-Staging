@@ -61,7 +61,10 @@ public class DataInitializer {
         try {
             List<Port> ports = List.of(
                     // ========== ASIA ==========
-                    new Port("Tokyo", new Coordinates(35.6895, 139.6917), "Asia"),
+                    new Port("Goto", new Coordinates(32.697052, 128.852815), "Asia"),
+                    new Port("Miyazaki", new Coordinates(31.17, 130.19), "Asia"),
+                    new Port("Osaka", new Coordinates(34.631243, 135.407996), "Asia"),
+                    new Port("Tokyo", new Coordinates(35.651981, 139.764228), "Asia"),
                     new Port("Busan", new Coordinates(35.1796, 129.0756), "Asia"),
                     new Port("Shanghai", new Coordinates(31.2304, 121.4737), "Asia"),
                     new Port("Tianjin", new Coordinates(39.0842, 117.2010), "Asia"),
@@ -82,6 +85,7 @@ public class DataInitializer {
                     new Port("Muara Port", new Coordinates(5.024628, 115.072012), "Asia"),//hacer ruta no te olvides
                     new Port("Semayang", new Coordinates(-1.273471, 116.805472), "Asia"),//hacer ruta no te olvides
                     new Port("Jeddah", new Coordinates(21.491871, 39.121831), "Asia"),
+                    new Port("Nah Trang", new Coordinates(12.204523, 109.218363), "Asia"),
 
                     // ========== AMÉRICA ==========
                     new Port("Santos", new Coordinates(-23.9500, -46.3333), "América"),
@@ -228,6 +232,11 @@ public class DataInitializer {
                     new RouteDocument("Singapore", "Asia", "Chennai", "Asia", 2700.0),
                     new RouteDocument("Tuticorin", "Asia", "Chennai", "Asia", 2700.0),
                     new RouteDocument("Singapore", "Asia", "Jakarta", "Asia", 900.0),
+                    new RouteDocument("Goto", "Asia", "Busan", "Asia",  145.4),
+                    new RouteDocument("Nah Trang", "Asia", "Zhanjiang", "Asia", 548.2),
+                    new RouteDocument("Miyazaki", "Asia", "Goto", "Asia", 140.7),
+                    new RouteDocument("Osaka", "Asia", "Tokyo", "Asia", 222.7),
+                    new RouteDocument("Osaka", "Asia", "Miyazaki", "Asia", 257.1),
                     new RouteDocument("Mumbai", "Asia", "Muscat", "Asia", 1800.0),
                     new RouteDocument("Mumbai", "Asia", "Tuticorin", "Asia", 284.4),
                     new RouteDocument("Mumbai", "Asia", "Dubai", "Asia", 1592.0),
@@ -239,7 +248,6 @@ public class DataInitializer {
                     new RouteDocument("Zhanjiang", "Asia", "Taiwán", "Asia", 659.2),
                     new RouteDocument("Taiwán", "Asia", "Tokyo", "Asia", 1138.1),
                     new RouteDocument("Taiwán", "Asia", "Hong Kong", "Asia", 439.3),
-                    new RouteDocument("Tokyo", "Asia", "Busan", "Asia", 528.1),
 
                     // ========== Rutas Oceánicas ==========
                     new RouteDocument("Jakarta", "Asia", "Darwin", "Oceanía", 2700.0),
