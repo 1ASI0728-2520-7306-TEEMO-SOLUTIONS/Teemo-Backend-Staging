@@ -37,7 +37,9 @@ public class RouteHistoryDocument {
     private String userId;
     private String routeId;
     private String originPortId;
+    private String originPortName;
     private String destinationPortId;
+    private String destinationPortName;
     private List<String> waypointPortIds;
     private List<String> avoidedPortIds;
     private Instant computedAt;

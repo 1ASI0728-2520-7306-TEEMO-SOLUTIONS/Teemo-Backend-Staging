@@ -24,6 +24,9 @@ import java.util.List;
 @RequestMapping("/api/ai")
 public class HazardAssessmentController {
 
+    private static final String NO_HAZARDS_MESSAGE =
+            "No se detectaron riesgos meteorologicos para la ruta evaluada en la ventana analizada.";
+
     private final WeatherHazardDetectionService detectionService;
 
     public HazardAssessmentController(WeatherHazardDetectionService detectionService) {
@@ -127,6 +130,9 @@ public class HazardAssessmentController {
         // Bandera de inviabilidad
         seg.setNotViableDueToIce(!eval.routeViable);
         seg.setAdvisory(eval.nonViableReason);
+        if (seg.getHazards().isEmpty()) {
+            seg.setAdvisory(NO_HAZARDS_MESSAGE);
+        }
 
         out.setSegments(List.of(seg));
         return out;

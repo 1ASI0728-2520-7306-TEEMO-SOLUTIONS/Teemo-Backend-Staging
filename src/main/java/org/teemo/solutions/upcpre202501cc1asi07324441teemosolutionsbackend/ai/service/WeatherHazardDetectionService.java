@@ -147,6 +147,9 @@ public class WeatherHazardDetectionService {
 
         boolean atlSeason = (month >= 8 && month <= 10);
         boolean pacSeason = (month >= 7 && month <= 10);
+        if (!(atlSeason || pacSeason)) {
+            return 0.0;
+        }
 
         double base = 0.25; // base si transita franja tropical
         if (atlSeason || pacSeason) base += 0.25; // pico estacional

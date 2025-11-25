@@ -132,8 +132,16 @@ components:
           nullable: true
         originPortId:
           type: string
+          nullable: true
+        originPortName:
+          type: string
+          nullable: true
         destinationPortId:
           type: string
+          nullable: true
+        destinationPortName:
+          type: string
+          nullable: true
         waypointPortIds:
           type: array
           items:

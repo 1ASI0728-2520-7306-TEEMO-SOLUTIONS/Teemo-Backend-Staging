@@ -22,7 +22,9 @@ public class RouteHistoryMapper {
                 document.getUserId(),
                 document.getRouteId(),
                 document.getOriginPortId(),
+                document.getOriginPortName(),
                 document.getDestinationPortId(),
+                document.getDestinationPortName(),
                 document.getWaypointPortIds(),
                 document.getAvoidedPortIds(),
                 document.getComputedAt(),
@@ -51,7 +53,9 @@ public class RouteHistoryMapper {
                 .userId(routeHistory.userId())
                 .routeId(routeHistory.routeId())
                 .originPortId(routeHistory.originPortId())
+                .originPortName(routeHistory.originPortName())
                 .destinationPortId(routeHistory.destinationPortId())
+                .destinationPortName(routeHistory.destinationPortName())
                 .waypointPortIds(routeHistory.waypointPortIds())
                 .avoidedPortIds(routeHistory.avoidedPortIds())
                 .computedAt(routeHistory.computedAt())
@@ -80,7 +84,9 @@ public class RouteHistoryMapper {
                 routeHistory.userId(),
                 routeHistory.routeId(),
                 routeHistory.originPortId(),
+                routeHistory.originPortName(),
                 routeHistory.destinationPortId(),
+                routeHistory.destinationPortName(),
                 routeHistory.waypointPortIds(),
                 routeHistory.avoidedPortIds(),
                 routeHistory.computedAt(),
