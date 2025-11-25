@@ -90,6 +90,13 @@
 		   <version>2.6.0</version>
 		  </dependency>
 
+          <!-- Reporting / Document generation -->
+          <dependency>
+           <groupId>org.apache.poi</groupId>
+           <artifactId>poi-ooxml</artifactId>
+           <version>5.2.5</version>
+          </dependency>
+
 		  <!-- Lombok Dependency -->
 		  <dependency>
 		   <groupId>org.projectlombok</groupId>

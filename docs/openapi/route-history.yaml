@@ -1,4 +1,39 @@
 paths:
+  /api/reports:
+    get:
+      summary: List shipment reports (route history summaries) for the authenticated user
+      tags:
+        - Route History
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 0
+          description: Zero-based page index (default 0).
+        - in: query
+          name: size
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+          description: Page size (default 20, max 100).
+        - in: query
+          name: archived
+          schema:
+            type: boolean
+          description: Include archived entries (default false).
+      responses:
+        '200':
+          description: Route report summaries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RouteReportSummaryListResponse'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
   /api/users/{userId}/route-history:
     get:
       summary: List route history for a user
@@ -115,8 +150,118 @@ paths:
           $ref: '#/components/responses/ForbiddenError'
         '404':
           $ref: '#/components/responses/NotFoundError'
+  /api/reports/{historyId}/pdf:
+    get:
+      summary: Download route report as PDF
+      tags:
+        - Route History
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: historyId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: PDF report
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+  /api/reports/{historyId}/excel:
+    get:
+      summary: Download route report as Excel
+      tags:
+        - Route History
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: historyId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Excel report
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+        '404':
+          $ref: '#/components/responses/NotFoundError'
 components:
   schemas:
+    RouteReportSummaryResource:
+      type: object
+      properties:
+        historyId:
+          type: string
+        shipmentId:
+          type: string
+        routeLabel:
+          type: string
+        origin:
+          type: string
+          nullable: true
+        destination:
+          type: string
+          nullable: true
+        status:
+          $ref: '#/components/schemas/RouteHistoryStatus'
+        progress:
+          type: number
+          format: double
+        departureTime:
+          type: string
+          format: date-time
+          nullable: true
+        estimatedArrivalTime:
+          type: string
+          format: date-time
+          nullable: true
+        totalDistance:
+          type: number
+          format: double
+          nullable: true
+        costEstimate:
+          type: number
+          format: double
+          nullable: true
+      required:
+        - historyId
+        - shipmentId
+        - routeLabel
+        - status
+        - progress
+    RouteReportSummaryListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/RouteReportSummaryResource'
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+      required:
+        - items
+        - page
+        - size
+        - totalElements
+        - totalPages
     RouteHistoryItemResource:
       type: object
       properties:
