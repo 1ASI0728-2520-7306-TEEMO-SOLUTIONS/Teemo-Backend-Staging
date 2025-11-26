@@ -1,0 +1,97 @@
+paths:
+  /api/ports/overview:
+    get:
+      summary: List global port overview information
+      tags:
+        - Ports
+      parameters:
+        - in: query
+          name: state
+          description: Filter by operational status (OPEN, RESTRICTED, CLOSED)
+          schema:
+            type: string
+            enum: [OPEN, RESTRICTED, CLOSED]
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 0
+          description: Zero-based page number (default 0).
+        - in: query
+          name: size
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+          description: Page size (default 10, max 100).
+      responses:
+        '200':
+          description: Global port overview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortOverviewResponse'
+components:
+  schemas:
+    PortOverviewItem:
+      type: object
+      properties:
+        portId:
+          type: string
+        name:
+          type: string
+        country:
+          type: string
+        lat:
+          type: number
+          format: double
+        lon:
+          type: number
+          format: double
+        status:
+          type: string
+          enum: [OPEN, RESTRICTED, CLOSED]
+        reason:
+          type: string
+          nullable: true
+        traffic:
+          type: integer
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+        contactPhone:
+          type: string
+          nullable: true
+        contactEmail:
+          type: string
+          nullable: true
+        website:
+          type: string
+          format: uri
+          nullable: true
+      required:
+        - portId
+        - name
+        - country
+        - lat
+        - lon
+        - status
+        - traffic
+    PortOverviewResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/PortOverviewItem'
+        totalElements:
+          type: integer
+          format: int64
+        lastSyncedAt:
+          type: string
+          format: date-time
+      required:
+        - content
+        - totalElements
+        - lastSyncedAt
