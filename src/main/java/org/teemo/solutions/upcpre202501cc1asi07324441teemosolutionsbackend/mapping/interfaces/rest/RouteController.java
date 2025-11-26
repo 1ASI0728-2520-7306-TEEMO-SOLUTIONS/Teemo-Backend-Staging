@@ -17,14 +17,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.application.internal.services.RouteHistoryContext;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.application.internal.services.RouteService;
+import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.application.internal.services.RoutePopularityService;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.exceptions.NoViableRouteAvoidingDisabledPortsException;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.exceptions.PortNotFoundException;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.exceptions.RouteNotFoundException;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.valueobjects.RouteHistorySource;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.infrastructure.persistence.sdmdb.documents.RouteDocument;
+import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.infrastructure.persistence.sdmdb.documents.RoutePopularityDocument;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.interfaces.rest.resources.RouteCalculationResource;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.interfaces.rest.resources.RouteDistanceResource;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.interfaces.rest.resources.RouteRecalculationResource;
+import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.interfaces.rest.resources.PopularRouteResource;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.shared.application.security.RoutingActorContext;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.shared.application.security.RoutingActorContextProvider;
 
@@ -38,10 +41,14 @@ public class RouteController {
 
     private static final Logger logger = LoggerFactory.getLogger(RouteController.class);
     private final RouteService routeService;
+    private final RoutePopularityService routePopularityService;
     private final RoutingActorContextProvider actorContextProvider;
 
-    public RouteController(RouteService routeService, RoutingActorContextProvider actorContextProvider) {
+    public RouteController(RouteService routeService,
+                           RoutePopularityService routePopularityService,
+                           RoutingActorContextProvider actorContextProvider) {
         this.routeService = routeService;
+        this.routePopularityService = routePopularityService;
         this.actorContextProvider = actorContextProvider;
     }
 
@@ -164,5 +171,27 @@ public class RouteController {
     public ResponseEntity<List<RouteDocument>> getAllRoutes() {
         List<RouteDocument> routesPage = routeService.findAllRoutes();
         return ResponseEntity.ok(routesPage);
+    }
+
+    @Operation(summary = "Obtiene las rutas más populares consultadas por los usuarios")
+    @GetMapping("/popular")
+    public ResponseEntity<List<PopularRouteResource>> getPopularRoutes(
+            @RequestParam(name = "limit", defaultValue = "8") int limit) {
+        int sanitizedLimit = limit <= 0 ? 8 : limit;
+        List<PopularRouteResource> resources = routePopularityService.findTopRoutes(sanitizedLimit).stream()
+                .map(this::toPopularRouteResource)
+                .toList();
+        return ResponseEntity.ok(resources);
+    }
+
+    private PopularRouteResource toPopularRouteResource(RoutePopularityDocument document) {
+        return new PopularRouteResource(
+                document.getRouteId(),
+                document.getOriginPortId(),
+                document.getOriginPortName(),
+                document.getDestinationPortId(),
+                document.getDestinationPortName(),
+                document.getSearchesCount()
+        );
     }
 }

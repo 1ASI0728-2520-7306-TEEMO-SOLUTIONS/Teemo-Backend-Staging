@@ -50,6 +50,7 @@ public class RouteService {
     private final GeoUtils geoUtils;
     private final PortMapper portMapper;
     private final RouteHistoryService routeHistoryService;
+    private final RoutePopularityService routePopularityService;
 
     public void saveAllRoutes(List<RouteDocument> routes) { routeRepository.saveAll(routes); }
     public boolean existsByHomePortAndDestinationPort(String h, String d) { return routeRepository.existsByHomePortAndDestinationPort(h, d); }
@@ -73,6 +74,7 @@ public class RouteService {
         Port startPort = findPortByIdOrThrow(startPortId);
         Port endPort = findPortByIdOrThrow(endPortId);
         RouteComputationResult result = computeRoute(startPort, endPort, avoidPortIds, false);
+        recordRouteSearch(startPort, endPort);
         persistSuccessfulHistory(historyContext, startPort, endPort, result, historyContext != null ? historyContext.routeId() : null);
         return result.response();
     }
@@ -303,6 +305,20 @@ public class RouteService {
         }
         if (endPort.getId() != null && disabledPortIds.contains(endPort.getId())) {
             throw new RouteNotFoundException("El puerto de destino '%s' esta deshabilitado temporalmente.".formatted(endPort.getName()));
+        }
+    }
+
+    private void recordRouteSearch(Port startPort, Port endPort) {
+        try {
+            String routeId = routeRepository.findByHomePortAndDestinationPort(startPort.getName(), endPort.getName())
+                    .map(RouteDocument::getId)
+                    .orElse(null);
+            routePopularityService.registerSearch(startPort, endPort, routeId);
+        } catch (Exception ex) {
+            logger.warn("route.popularity.failed origin={} destination={} message={}",
+                    startPort != null ? startPort.getName() : "unknown",
+                    endPort != null ? endPort.getName() : "unknown",
+                    ex.getMessage());
         }
     }
     private record RouteComputationResult(List<Port> ports, RouteCalculationResource response, Set<String> effectiveAvoidPortIds) {}
