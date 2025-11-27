@@ -58,7 +58,7 @@ public class UserCommandServiceImpl implements UserCommandService {
         userRepository.saveUser(user);
 
         var token = tokenService.generateToken(user.getUsername());
-        var confirmationLink = "http://localhost:8080/api/authentication/confirm?token=" + token;
+        var confirmationLink = "http://localhost:4200/auth/confirm?token=" + token;
 
         var subject = "Por favor, confirme su registro";
         var body = "Por favor, confirme su registro haciendo clic en el siguiente enlace:\n\n"

@@ -38,7 +38,7 @@ public class AuthenticationController {
         return ResponseEntity.ok(authenticatedUserResource);
     }
 
-    @GetMapping("/confirm")
+    @PostMapping("/confirm")
     public ResponseEntity<Void> confirmRegistration(@RequestBody ConfirmRegistrationResource resource) {
         var command = ConfirmUserRegistrationCommandFromResourceAssembler.toCommandFromResource(resource);
         var user = userCommandService.handle(command);
