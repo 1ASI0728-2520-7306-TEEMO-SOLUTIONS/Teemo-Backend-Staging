@@ -2,6 +2,10 @@ package org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.iam.
 
 import java.util.List;
 
-public record SignUpResource(String username, String password,
-                             List<String> roles) {
+public record SignUpResource(
+        String username,
+        String password,
+        String email,
+        List<String> roles
+) {
 }

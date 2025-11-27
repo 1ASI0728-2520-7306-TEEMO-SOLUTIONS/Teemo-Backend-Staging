@@ -2,6 +2,7 @@ package org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.iam.
 
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -27,23 +28,35 @@ public class User extends AuditableAbstractAggregateRoot<User> {
     @Size(max = 120)
     private String password;
 
+    @NotBlank
+    @Size(max = 150)
+    private String email;
+
+    @NotNull
+    private boolean isRegistered;
+
     private Set<Role> roles;
 
     public User() { this.roles = new HashSet<>(); }
 
-    public User(String username, String password) {
+    public User(String username, String password, String email) {
         this();
         this.username = username;
         this.password = password;
+        this.email = email;
     }
 
-    public User(String username, String password, List<Role> roles) {
-        this(username, password);
+    public User(String username, String password, String email, List<Role> roles) {
+        this(username, password, email);
         addRoles(roles);
     }
 
     public void addRoles(List<Role> roles) {
         var validatedRoles = Role.validateRoleSet(roles);
         this.roles.addAll(validatedRoles);
+    }
+
+    public void confirmRegistration() {
+        this.isRegistered = true;
     }
 }

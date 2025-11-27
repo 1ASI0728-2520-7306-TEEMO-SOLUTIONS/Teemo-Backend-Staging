@@ -4,19 +4,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.iam.domain.services.UserCommandService;
-import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.iam.interfaces.rest.resources.AuthenticatedUserResource;
-import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.iam.interfaces.rest.resources.SignInResource;
-import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.iam.interfaces.rest.resources.SignUpResource;
-import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.iam.interfaces.rest.resources.UserResource;
-import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.iam.interfaces.rest.transform.AuthenticatedUserResourceFromEntityAssembler;
-import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.iam.interfaces.rest.transform.SignInCommandFromResourceAssembler;
-import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.iam.interfaces.rest.transform.SignUpCommandFromResourceAssembler;
-import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.iam.interfaces.rest.transform.UserResourceFromEntityAssembler;
+import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.iam.interfaces.rest.resources.*;
+import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.iam.interfaces.rest.transform.*;
 
 @RestController
 @RequestMapping(value = "/api/authentication", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -45,5 +36,13 @@ public class AuthenticationController {
         if (authenticatedUser.isEmpty()) return ResponseEntity.notFound().build();
         var authenticatedUserResource = AuthenticatedUserResourceFromEntityAssembler.toResourceFromEntity(authenticatedUser.get().getLeft(), authenticatedUser.get().getRight());
         return ResponseEntity.ok(authenticatedUserResource);
+    }
+
+    @GetMapping("/confirm")
+    public ResponseEntity<Void> confirmRegistration(@RequestBody ConfirmRegistrationResource resource) {
+        var command = ConfirmUserRegistrationCommandFromResourceAssembler.toCommandFromResource(resource);
+        var user = userCommandService.handle(command);
+        if (user.isEmpty()) return ResponseEntity.badRequest().build();
+        return ResponseEntity.ok().build();
     }
 }
