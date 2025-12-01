@@ -9,6 +9,8 @@ import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mappi
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.domain.model.valueobjects.Coordinates;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.infrastructure.persistence.sdmdb.documents.PortDocument;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.mapping.infrastructure.persistence.sdmdb.repositories.PortRepository;
+import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.notifications.application.internal.services.NotificationService;
+import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.notifications.domain.model.valueobjects.NotificationAction;
 
 import java.time.Instant;
 import java.util.List;
@@ -20,10 +22,12 @@ public class PortService {
     private static final Logger logger = LoggerFactory.getLogger(PortService.class);
 
     private final PortRepository portRepository;
+    private final NotificationService notificationService;
 
     @Autowired
-    public PortService (PortRepository portRepository) {
+    public PortService(PortRepository portRepository, NotificationService notificationService) {
         this.portRepository = portRepository;
+        this.notificationService = notificationService;
     }
 
     public Port createPort(CreatePortCommand command) {
@@ -83,11 +87,15 @@ public class PortService {
         document.setDisabledAt(now);
         document.setDisabledBy(actor);
         PortDocument saved = portRepository.save(document);
+        Port port = saved.toDomain();
         logger.info(
                 "AUDIT port.disable actor={} portId={} oldDisabled={} newDisabled={} reason={} timestamp={}",
                 actor, portId, previousState, true, reason, now
         );
-        return saved.toDomain();
+        if (!previousState) {
+            notificationService.registerPortStatusChange(port, NotificationAction.DISABLED, reason, actor);
+        }
+        return port;
     }
 
     public Port enablePort(String portId, String actor) {
@@ -100,11 +108,15 @@ public class PortService {
         document.setDisabledAt(null);
         document.setDisabledBy(null);
         PortDocument saved = portRepository.save(document);
+        Port port = saved.toDomain();
         logger.info(
                 "AUDIT port.enable actor={} portId={} oldDisabled={} newDisabled={} clearedReason={} timestamp={}",
                 actor, portId, previousState, false, previousReason, now
         );
-        return saved.toDomain();
+        if (previousState) {
+            notificationService.registerPortStatusChange(port, NotificationAction.ENABLED, null, actor);
+        }
+        return port;
     }
 
     public void deletePort(String id) {
