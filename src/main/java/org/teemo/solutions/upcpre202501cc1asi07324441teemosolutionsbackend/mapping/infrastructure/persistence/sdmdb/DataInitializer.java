@@ -106,7 +106,7 @@ public class DataInitializer {
                     new Port("Rio de Janeiro", new Coordinates(-22.9068, -43.1729), "América"),
                     new Port("Fort Lauderdale", new Coordinates(26.1224, -80.1373), "América"),
                     new Port("Guayaquil", new Coordinates(-2.1962, -79.8862), "América"),
-                    new Port("Balboa", new Coordinates(8.9833, -79.5167), "América"),
+                    new Port("Balboa", new Coordinates(8.939008, -79.555637), "América"),
                     new Port("Manzanillo", new Coordinates(19.0514, -104.3158), "América"),
                     new Port("Long Beach", new Coordinates(33.7709, -118.1937), "América"),
                     new Port("New York", new Coordinates(40.7128, -74.0060), "América"),
