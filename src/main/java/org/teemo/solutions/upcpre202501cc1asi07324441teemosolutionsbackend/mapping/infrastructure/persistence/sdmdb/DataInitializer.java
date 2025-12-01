@@ -235,6 +235,7 @@ public class DataInitializer {
                     new RouteDocument("Singapore", "Asia", "Jakarta", "Asia", 900.0),
                     new RouteDocument("Goto", "Asia", "Busan", "Asia",  145.4),
                     new RouteDocument("Nah Trang", "Asia", "Zhanjiang", "Asia", 548.2),
+                    new RouteDocument("Shanghai", "Asia", "Goto", "Asia", 382.3),
                     new RouteDocument("Miyazaki", "Asia", "Goto", "Asia", 140.7),
                     new RouteDocument("Osaka", "Asia", "Tokyo", "Asia", 222.7),
                     new RouteDocument("Osaka", "Asia", "Miyazaki", "Asia", 257.1),
@@ -285,6 +286,8 @@ public class DataInitializer {
 
                     new RouteDocument("Manzanillo", "América", "Long Beach", "América", 1152.6),
                     new RouteDocument("Lázaro Cárdenas", "América", "Acajutla", "América",  763.2),
+                    new RouteDocument("Balboa", "América", "Acajutla", "América",  665.9),
+
                     new RouteDocument("Manzanillo", "América", "Lázaro Cárdenas", "América", 2800.0),
                     new RouteDocument("New York", "América", "Fort Lauderdale", "América", 1600.0),
                     new RouteDocument("Vancouver", "América", "San Francisco", "América", 1900.0),
@@ -299,15 +302,18 @@ public class DataInitializer {
 
                     // Vía estrecho de Magallanes
                     new RouteDocument("San Antonio", "América", "Puerto Montt", "América", 476.0),
-                    new RouteDocument("Buenos Aires", "América", "Rio Grande", "América", 800.0),
                     new RouteDocument("Buenos Aires", "América", "Necochea y Quequén", "América", 239.5),
                     new RouteDocument("Necochea y Quequén", "América", "Stanley", "América",  788.9),
                     new RouteDocument("Stanley", "América", "Ushuaia", "América",  419.3),
                     new RouteDocument("Ushuaia", "América", "Puerto Montt", "América",  824.2),
-                    new RouteDocument("Rio Grande", "América", "Rio de Janeiro", "América", 1200.0),
+                    new RouteDocument("Santos", "América", "Rio de Janeiro", "América",186.8),
+                    new RouteDocument("Santos", "América", "Rio Grande", "América",570.7),
+                    new RouteDocument("Rio Grande", "América", "Montevideo", "América",269.9),
+                    new RouteDocument("Buenos Aires", "América", "Montevideo", "América",105.5),
                     new RouteDocument("New York", "América", "Montreal", "América", 600.0),
                     new RouteDocument("New York", "América", "Houston", "América", 2300.0),
                     new RouteDocument("Houston", "América", "Colón", "América", 2500.0),
+                    new RouteDocument("Colón", "América", "Balboa", "América", 32.6),
                     new RouteDocument("Colón", "América", "Cartagena", "América", 500.0),
                     new RouteDocument("Cartagena", "América", "Puerto Cabello", "América", 600.0),
                     new RouteDocument("Puerto Cabello", "América", "Cayena", "América", 1500.0),
@@ -394,8 +400,8 @@ public class DataInitializer {
                     new RouteDocument("Durban", "África", "Mombasa", "África", 3200.0),
                     new RouteDocument("Mombasa", "África", "Mogadishu", "África", 1000.0),
                     // ========== Rutas Troncales Transoceánicas (Puentes Globales) ==========
-                    new RouteDocument("San Francisco", "América", "Tokyo", "Asia", 8500.0),
-                    new RouteDocument("Lisboa", "Europa", "Rio de Janeiro", "América", 4170.5),
+                    new RouteDocument("San Francisco", "América", "Tokyo", "Asia",8500.0),
+                    new RouteDocument("Lisboa", "Europa", "Cayena", "América", 3103.3),
                     new RouteDocument("Singapore", "Asia", "Rio de Janeiro", "América", 8496.7),
                     new RouteDocument("Lisboa", "Europa", "New York", "América",  2928.6),
 
