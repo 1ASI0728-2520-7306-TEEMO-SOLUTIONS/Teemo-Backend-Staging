@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17-jre AS builder
+FROM eclipse-temurin:17-jdk AS builder
 
 WORKDIR /app
 
