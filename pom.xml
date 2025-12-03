@@ -69,6 +69,11 @@
 		   <artifactId>spring-boot-starter-security</artifactId>
 		  </dependency>
 
+             <dependency>
+                 <groupId>org.mongodb</groupId>
+                 <artifactId>mongodb-driver-sync</artifactId>
+             </dependency>
+
 		  <!-- JWT Dependencies (Se mantienen las versiones explícitas porque no son de Spring) -->
 		  <dependency>
 		   <groupId>io.jsonwebtoken</groupId>
