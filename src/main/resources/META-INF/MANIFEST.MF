@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Main-Class: org.teemo.solutions.upcpre202501cc1asi07324441teemosolutions
+ backend.UpcPre202501Cc1asi07324441TeemoSolutionsBackEndApplication
+
