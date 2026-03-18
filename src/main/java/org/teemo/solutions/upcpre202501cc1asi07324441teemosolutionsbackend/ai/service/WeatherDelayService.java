@@ -16,6 +16,7 @@ import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.Map;
 
+@Lazy
 @Service
 public class WeatherDelayService {
     private static final Logger log = LoggerFactory.getLogger(WeatherDelayService.class);
