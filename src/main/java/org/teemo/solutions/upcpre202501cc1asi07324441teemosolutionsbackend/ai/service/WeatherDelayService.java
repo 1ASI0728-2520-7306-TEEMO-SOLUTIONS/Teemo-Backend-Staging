@@ -6,6 +6,7 @@ import ai.onnxruntime.OrtException;
 import ai.onnxruntime.OrtSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.ai.dto.WeatherDelayRequest;
@@ -22,7 +23,8 @@ public class WeatherDelayService {
     private static final Logger log = LoggerFactory.getLogger(WeatherDelayService.class);
 
     private final OrtEnvironment env;
-    private final OrtSession session;
+    private final ObjectProvider<OrtSession> sessionProvider;
+    private volatile OrtSession session;
     private String inputName;
     private String outputName;
     private boolean sessionMetadataLoaded = false;
@@ -37,13 +39,13 @@ public class WeatherDelayService {
 
     public WeatherDelayService(
             OrtEnvironment env,
-            @Lazy OrtSession session,
+            ObjectProvider<OrtSession> sessionProvider,
             WeatherFeatureBuilder featureBuilder,
             WeatherModelPreprocessor preprocessor,
             WeatherHazardDetectionService hazardDetectionService
     ) {
         this.env = env;
-        this.session = session;
+        this.sessionProvider = sessionProvider;
         this.featureBuilder = featureBuilder;
         this.preprocessor = preprocessor;
         this.hazardDetectionService = hazardDetectionService;
@@ -51,12 +53,18 @@ public class WeatherDelayService {
 
     private synchronized void ensureSessionMetadataLoaded() throws OrtException {
         if (!sessionMetadataLoaded) {
-            this.inputName = session.getInputInfo().keySet().iterator().next();
-            this.outputName = session.getOutputInfo().keySet().iterator().next();
+            OrtSession resolvedSession = this.session;
+            if (resolvedSession == null) {
+                resolvedSession = sessionProvider.getObject();
+                this.session = resolvedSession;
+            }
+
+            this.inputName = resolvedSession.getInputInfo().keySet().iterator().next();
+            this.outputName = resolvedSession.getOutputInfo().keySet().iterator().next();
 
             log.info("[ONNX] inputName='{}', outputName='{}'", inputName, outputName);
-            session.getInputInfo().forEach((k, v) -> log.info("[ONNX] Available input -> {}", k));
-            session.getOutputInfo().forEach((k, v) -> log.info("[ONNX] Available output -> {}", k));
+            resolvedSession.getInputInfo().forEach((k, v) -> log.info("[ONNX] Available input -> {}", k));
+            resolvedSession.getOutputInfo().forEach((k, v) -> log.info("[ONNX] Available output -> {}", k));
 
             sessionMetadataLoaded = true;
         }
@@ -103,7 +111,11 @@ public class WeatherDelayService {
             double modelScore;
             try (OnnxTensor tensor = OnnxTensor.createTensor(
                     env, java.nio.FloatBuffer.wrap(input), shape)) {
-                try (OrtSession.Result result = session.run(Map.of(inputName, tensor))) {
+                OrtSession activeSession = this.session;
+                if (activeSession == null) {
+                    throw new IllegalStateException("ONNX session not initialized");
+                }
+                try (OrtSession.Result result = activeSession.run(Map.of(inputName, tensor))) {
                     Object val = result.get(outputName).get().getValue();
                     if (val instanceof float[]) modelScore = ((float[]) val)[0];
                     else if (val instanceof float[][]) modelScore = ((float[][]) val)[0][0];

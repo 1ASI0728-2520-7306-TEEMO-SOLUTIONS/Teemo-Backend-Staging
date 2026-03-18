@@ -8,6 +8,7 @@ import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.ai.dt
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.ai.service.WeatherDelayService;
 
 @RestController
+@Lazy
 @RequestMapping("/api/ai")
 public class WeatherDelayController {
 
