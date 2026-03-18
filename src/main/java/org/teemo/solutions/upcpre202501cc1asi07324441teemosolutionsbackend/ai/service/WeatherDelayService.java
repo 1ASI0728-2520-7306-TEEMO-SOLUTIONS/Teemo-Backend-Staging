@@ -1,8 +1,12 @@
 package org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.ai.service;
 
-import ai.onnxruntime.*;
+import ai.onnxruntime.OnnxTensor;
+import ai.onnxruntime.OrtEnvironment;
+import ai.onnxruntime.OrtException;
+import ai.onnxruntime.OrtSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.ai.dto.WeatherDelayRequest;
 import org.teemo.solutions.upcpre202501cc1asi07324441teemosolutionsbackend.ai.dto.WeatherDelayResponse;
@@ -18,51 +22,54 @@ public class WeatherDelayService {
 
     private final OrtEnvironment env;
     private final OrtSession session;
-    private final String inputName;
-    private final String outputName;
+    private String inputName;
+    private String outputName;
+    private boolean sessionMetadataLoaded = false;
 
     private final WeatherFeatureBuilder featureBuilder;
     private final WeatherModelPreprocessor preprocessor;
-    private final WeatherHazardDetectionService hazardDetectionService; // NUEVO
+    private final WeatherHazardDetectionService hazardDetectionService;
 
-    // ====== Parámetros de realismo (ajústalos si lo ves necesario) ======
-    /** Fracción del tiempo planificado que como máximo aporta el score del modelo. */
-    private static final double SENSITIVITY = 0.10;         // 10%
-    /** Tope por fracción del tiempo planificado. */
-    private static final double MAX_FRACTION = 0.25;        // 25%
-    /** Tope absoluto de retraso en horas. */
-    private static final double ABSOLUTE_CAP_HOURS = 72.0;  // 72 h (3 días)
+    private static final double SENSITIVITY = 0.10;
+    private static final double MAX_FRACTION = 0.25;
+    private static final double ABSOLUTE_CAP_HOURS = 72.0;
 
     public WeatherDelayService(
             OrtEnvironment env,
-            OrtSession session,
+            @Lazy OrtSession session,
             WeatherFeatureBuilder featureBuilder,
             WeatherModelPreprocessor preprocessor,
-            WeatherHazardDetectionService hazardDetectionService // NUEVO
-    ) throws OrtException {
+            WeatherHazardDetectionService hazardDetectionService
+    ) {
         this.env = env;
         this.session = session;
         this.featureBuilder = featureBuilder;
         this.preprocessor = preprocessor;
         this.hazardDetectionService = hazardDetectionService;
+    }
 
-        // Descubrir nombres reales de entradas/salidas y registrarlos
-        this.inputName = session.getInputInfo().keySet().iterator().next();
-        this.outputName = session.getOutputInfo().keySet().iterator().next();
-        log.info("[ONNX] inputName='{}', outputName='{}'", inputName, outputName);
+    private synchronized void ensureSessionMetadataLoaded() throws OrtException {
+        if (!sessionMetadataLoaded) {
+            this.inputName = session.getInputInfo().keySet().iterator().next();
+            this.outputName = session.getOutputInfo().keySet().iterator().next();
 
-        session.getInputInfo().forEach((k, v) -> log.info("[ONNX] Available input -> {}", k));
-        session.getOutputInfo().forEach((k, v) -> log.info("[ONNX] Available output -> {}", k));
+            log.info("[ONNX] inputName='{}', outputName='{}'", inputName, outputName);
+            session.getInputInfo().forEach((k, v) -> log.info("[ONNX] Available input -> {}", k));
+            session.getOutputInfo().forEach((k, v) -> log.info("[ONNX] Available output -> {}", k));
+
+            sessionMetadataLoaded = true;
+        }
     }
 
     public WeatherDelayResponse predict(WeatherDelayRequest req) {
         long t0 = System.currentTimeMillis();
         try {
-            // Validación mínima
+            ensureSessionMetadataLoaded();
+
             if (req.getCruiseSpeedKnots() == null || req.getCruiseSpeedKnots() == 0) {
                 throw new IllegalArgumentException("cruiseSpeedKnots es requerido y debe ser > 0.");
             }
-            // Si no viene distanceKm, intentamos calcularla con lat/lon (tramo)
+
             if (req.getDistanceKm() == null) {
                 if (req.getOriginLat() != null && req.getOriginLon() != null
                         && req.getDestLat() != null && req.getDestLon() != null) {
@@ -73,80 +80,70 @@ public class WeatherDelayService {
                 }
             }
 
-            // Construir features (si no vienen avgWind/maxWave, el builder los completa)
             var f = featureBuilder.build(req);
-            float distanceKm   = f.distanceKm();
+            float distanceKm = f.distanceKm();
             float plannedHours = f.plannedHours();
-            float avgWindKn    = f.avgWindKnots();
-            float maxWaveM     = f.maxWaveM();
+            float avgWindKn = f.avgWindKnots();
+            float maxWaveM = f.maxWaveM();
 
-            // Si llegaron coordenadas, volvemos a priorizar la distancia del TRAMO por seguridad
             if (req.getOriginLat() != null && req.getOriginLon() != null
                     && req.getDestLat() != null && req.getDestLon() != null) {
                 double dKm = haversineKm(req.getOriginLat(), req.getOriginLon(), req.getDestLat(), req.getDestLon());
-                if (dKm > 1.0) { // distancia válida
+                if (dKm > 1.0) {
                     distanceKm = (float) dKm;
-                    // knots -> km/h: 1 kn = 1.852 km/h
                     double speedKmH = req.getCruiseSpeedKnots() * 1.852;
                     plannedHours = (float) (distanceKm / speedKmH);
                 }
             }
 
-            // ---------------- INFERENCIA ONNX ----------------
             float[] input = buildModelInput(f, distanceKm, avgWindKn, maxWaveM);
-            long[] shape  = new long[] { 1, input.length };
+            long[] shape = new long[]{1, input.length};
 
             double modelScore;
             try (OnnxTensor tensor = OnnxTensor.createTensor(
                     env, java.nio.FloatBuffer.wrap(input), shape)) {
                 try (OrtSession.Result result = session.run(Map.of(inputName, tensor))) {
                     Object val = result.get(outputName).get().getValue();
-                    if (val instanceof float[])        modelScore = ((float[])   val)[0];
+                    if (val instanceof float[]) modelScore = ((float[]) val)[0];
                     else if (val instanceof float[][]) modelScore = ((float[][]) val)[0][0];
-                    else if (val instanceof double[])  modelScore = ((double[])  val)[0];
+                    else if (val instanceof double[]) modelScore = ((double[]) val)[0];
                     else throw new IllegalStateException("Tipo de salida ONNX no soportado: " + val.getClass());
                 }
             }
 
-            // Interpretamos la salida del modelo como SCORE [0..1]
             double scoreClamped = Math.max(0.0, Math.min(1.0, modelScore));
-            double rawDelay     = plannedHours * scoreClamped * SENSITIVITY;
+            double rawDelay = plannedHours * scoreClamped * SENSITIVITY;
 
-            // Topes de realismo
             double realisticCap = Math.min(plannedHours * MAX_FRACTION, ABSOLUTE_CAP_HOURS);
-            double delayHours   = Math.min(Math.max(0.0, rawDelay), realisticCap);
+            double delayHours = Math.min(Math.max(0.0, rawDelay), realisticCap);
 
-            // ---------------- PROBABILIDAD/CAUSA (heurística ligera) ----------------
             double prob = Math.min(1.0, Math.max(0.0,
                     0.02 * avgWindKn + 0.12 * Math.max(0.0, maxWaveM - 1.0)));
             String cause = (maxWaveM >= 3.5)
                     ? "Oleaje fuerte"
                     : (avgWindKn >= 25.0 ? "Viento fuerte" : "Condiciones leves");
 
-            // ---------------- ETA planificado y ajustado ----------------
             String plannedEtaIso = null, adjustedEtaIso = null;
             Instant depRef = Instant.now();
             if (req.getDepartureTimeIso() != null && !req.getDepartureTimeIso().isBlank()) {
                 try {
-                    depRef = Instant.parse(req.getDepartureTimeIso()); // ISO-8601 (Z/offset)
+                    depRef = Instant.parse(req.getDepartureTimeIso());
                     long plannedSec = Math.round(plannedHours * 3600.0);
-                    long totalSec   = Math.round((plannedHours + delayHours) * 3600.0);
-                    plannedEtaIso   = depRef.plusSeconds(plannedSec).toString();
-                    adjustedEtaIso  = depRef.plusSeconds(totalSec).toString();
+                    long totalSec = Math.round((plannedHours + delayHours) * 3600.0);
+                    plannedEtaIso = depRef.plusSeconds(plannedSec).toString();
+                    adjustedEtaIso = depRef.plusSeconds(totalSec).toString();
                 } catch (DateTimeParseException ex) {
                     log.warn("departureTimeIso no es ISO-8601 válido: '{}'", req.getDepartureTimeIso());
                 }
             }
 
-            // ---------------- HAZARDS (probabilidades por zona) ----------------
             double oLat = req.getOriginLat() != null ? req.getOriginLat() : 0.0;
             double oLon = req.getOriginLon() != null ? req.getOriginLon() : 0.0;
-            double dLat = req.getDestLat()   != null ? req.getDestLat()   : 0.0;
-            double dLon = req.getDestLon()   != null ? req.getDestLon()   : 0.0;
+            double dLat = req.getDestLat() != null ? req.getDestLat() : 0.0;
+            double dLon = req.getDestLon() != null ? req.getDestLon() : 0.0;
 
             var eval = hazardDetectionService.evaluate(oLat, oLon, dLat, dLon, depRef);
 
-            // ---------------- Logging de trazabilidad ----------------
             log.info("[IA] features => distanceKm={}, plannedHours={}, avgWindKnots={}, maxWaveM={}",
                     String.format("%.2f", distanceKm),
                     String.format("%.2f", plannedHours),
@@ -163,7 +160,6 @@ public class WeatherDelayService {
                     String.format("%.2f", eval.overallHazardProbability),
                     eval.hazards != null ? eval.hazards.size() : 0);
 
-            // ---------------- Respuesta ----------------
             var resp = new WeatherDelayResponse();
             resp.setDelayHours(delayHours);
             resp.setDelayProbability(prob);
@@ -175,7 +171,6 @@ public class WeatherDelayService {
             resp.setUsedAvgWindKnots((double) avgWindKn);
             resp.setUsedMaxWaveM((double) maxWaveM);
 
-            // NUEVOS CAMPOS (prob. por zonas)
             resp.setRouteViable(eval.routeViable);
             resp.setNonViableReason(eval.nonViableReason);
             resp.setOverallHazardProbability(eval.overallHazardProbability);
@@ -201,7 +196,6 @@ public class WeatherDelayService {
             fallback.setUsedFallback(true);
             fallback.setUsedAvgWindKnots(null);
             fallback.setUsedMaxWaveM(null);
-            // Fallback de hazards
             fallback.setRouteViable(true);
             fallback.setNonViableReason(null);
             fallback.setOverallHazardProbability(0.0);
@@ -251,15 +245,14 @@ public class WeatherDelayService {
         }
     }
 
-    // ====== Util: distancia geodésica para tramo ======
     private static double haversineKm(double lat1, double lon1, double lat2, double lon2) {
-        final double R = 6371.0088; // km
+        final double R = 6371.0088;
         double dLat = Math.toRadians(lat2 - lat1);
         double dLon = Math.toRadians(lon2 - lon1);
-        double a = Math.sin(dLat/2)*Math.sin(dLat/2)
-                + Math.cos(Math.toRadians(lat1))*Math.cos(Math.toRadians(lat2))
-                * Math.sin(dLon/2)*Math.sin(dLon/2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return R * c;
     }
 }

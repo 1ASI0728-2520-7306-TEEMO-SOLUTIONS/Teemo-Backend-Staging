@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.Resource;
 
 import java.io.IOException;
@@ -26,6 +27,7 @@ public class ModelConfig {
     }
 
     @Bean
+    @Lazy
     public OrtSession ortSession(OrtEnvironment env) throws OrtException, IOException {
         if (!modelResource.exists()) {
             throw new IllegalStateException("ONNX model not found: " + modelResource);
