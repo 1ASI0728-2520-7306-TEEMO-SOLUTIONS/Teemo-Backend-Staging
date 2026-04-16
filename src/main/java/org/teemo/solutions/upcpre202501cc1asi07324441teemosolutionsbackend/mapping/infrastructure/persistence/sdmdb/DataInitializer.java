@@ -404,6 +404,7 @@ public class DataInitializer {
                     new RouteDocument("Lisboa", "Europa", "Cayena", "América", 3103.3),
                     new RouteDocument("Singapore", "Asia", "Rio de Janeiro", "América", 8496.7),
                     new RouteDocument("Lisboa", "Europa", "New York", "América",  2928.6),
+                    new RouteDocument("Lisboa", "Europa", "Puerto Cabello", "América",  3566.0),
 
                     new RouteDocument("Dakar", "África", "Cayena", "América", 4000.0),
                     new RouteDocument("Ciudad del Cabo", "África", "Buenos Aires", "América", 6900.0),
@@ -438,7 +439,6 @@ public class DataInitializer {
                     new RouteDocument("Aden", "Asia", "Mogadishu", "África", 1200.0),
                     new RouteDocument("Atenas", "Europa", "Estambul", "Europa", 700.0),
 
-                     // --- ¡¡¡AÑADE ESTA LÍNEA PUENTE!!! ---
                     new RouteDocument("Estambul", "Europa", "Constanza", "Europa", 400.0), // Conecta el Mediterráneo con el Mar Negro
 
                     new RouteDocument("Hamburgo", "Europa", "Copenhague", "Europa", 500.0)
